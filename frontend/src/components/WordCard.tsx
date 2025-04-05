@@ -1,94 +1,115 @@
 import { useState } from 'react'
-import { Volume2, Eye, Repeat, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
-import classNames from 'classnames'
+import { Eye, Volume2, Repeat, CheckCircle2 } from 'lucide-react'
+import { Button } from './ui/button'
+import { speak } from '../utils/speak'
 
 interface WordCardProps {
   word: {
     id: number
     word: string
     translation: string
-    transcription?: string
     example: string
+    learned: boolean
   }
 }
 
 export default function WordCard({ word }: WordCardProps) {
   const [isEnglish, setIsEnglish] = useState(true)
-  const [showTranslation, setShowTranslation] = useState(false)
+  const [isTranslationShown, setIsTranslationShown] = useState(false)
 
-  const displayWord = isEnglish ? word.word : word.translation
-  const displayTranslation = isEnglish ? word.translation : word.word
-  const shouldBlurExampleWord = !isEnglish && !showTranslation
+  const currentWord = isEnglish ? word.word : word.translation
+  const currentTranslation = isEnglish ? word.translation : word.word
 
-  const speak = () => {
-    const utterance = new SpeechSynthesisUtterance(word.word)
-    speechSynthesis.speak(utterance)
+  const toggleLanguage = () => {
+    setIsEnglish(!isEnglish)
+    setIsTranslationShown(false) // сбрасываем блюр при смене языка
   }
 
-  const highlightedExample = word.example.replace(
-    new RegExp(`\\b${word.word}\\b`, 'gi'),
-    (match) =>
-      `<span class="${classNames('font-bold', {
-        'blur-sm text-transparent select-none': shouldBlurExampleWord,
-      })}">${match}</span>`
-  )
+  const toggleTranslation = () => {
+    setIsTranslationShown(!isTranslationShown)
+  }
+
+  const playSound = () => {
+    speak(word.word)
+  }
+
+  // Выделение target-слова в примере
+  const exampleParts = word.example.split(new RegExp(`(${word.word})`, 'i'))
 
   return (
     <motion.div
-      className="bg-zinc-900 rounded-3xl p-6 space-y-4 border border-zinc-800 w-full"
+      className="bg-zinc-900 rounded-3xl shadow-lg p-6 w-full border border-zinc-800 space-y-6 flex flex-col justify-between"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -20 }}
+      layout
     >
-      <div className="space-y-1">
-        <h2 className="text-2xl font-bold text-white leading-tight">{displayWord}</h2>
-        {word.transcription && isEnglish && (
-          <p className="text-sm text-zinc-400">{word.transcription}</p>
-        )}
-        <div className="relative">
-          <p
-            className={classNames(
-              'text-sm transition-all',
-              showTranslation ? 'text-zinc-300' : 'text-zinc-500 blur-sm'
-            )}
-          >
-            {displayTranslation}
-          </p>
-          {!showTranslation && (
-            <div className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm rounded"></div>
+      {/* Слово + Перевод */}
+      <div className="space-y-2 text-left">
+        <h2 className="text-2xl font-bold leading-tight text-white">
+          {currentWord}
+        </h2>
+        <p
+          className={`italic text-sm relative w-fit ${
+            isTranslationShown ? 'text-zinc-300' : 'text-zinc-300/40'
+          }`}
+        >
+          {currentTranslation}
+          {!isTranslationShown && (
+            <span className="absolute inset-0 backdrop-blur-sm bg-black/30 rounded pointer-events-none" />
           )}
-        </div>
+        </p>
       </div>
 
-      <div className="text-sm text-zinc-400">
-        <span dangerouslySetInnerHTML={{ __html: highlightedExample }} />
+      {/* Пример */}
+      <div className="relative text-sm text-zinc-300 leading-snug text-left">
+        {exampleParts.map((part, index) => {
+          const isTarget = index % 2 === 1
+
+          return (
+            <span key={index} className="relative font-normal">
+              {isTarget ? (
+                <span className="font-semibold relative inline-block">
+                  {part}
+                  {/* Скрываем слово в примере только если перевод показан и язык русский */}
+                  {isEnglish || isTranslationShown ? null : (
+                    <span className="absolute inset-0 backdrop-blur-sm bg-black/40 rounded-sm pointer-events-none" />
+                  )}
+                </span>
+              ) : (
+                part
+              )}
+            </span>
+          )
+        })}
       </div>
 
-      <div className="flex items-center justify-between pt-4">
+      {/* Контролы */}
+      <div className="flex justify-between items-center pt-4 flex-wrap gap-3">
         <button
-          onClick={() => setIsEnglish((prev) => !prev)}
-          className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition"
+          onClick={toggleTranslation}
+          className="flex items-center gap-2 text-sm text-white"
         >
-          <Repeat className="w-5 h-5 text-white" />
+          <Eye size={18} />
         </button>
 
         <button
-          onClick={() => setShowTranslation((prev) => !prev)}
-          className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition"
+          onClick={playSound}
+          className="flex items-center gap-2 text-sm text-white"
         >
-          <Eye className="w-5 h-5 text-white" />
+          <Volume2 size={18} />
         </button>
 
         <button
-          onClick={speak}
-          className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition"
+          onClick={toggleLanguage}
+          className="flex items-center gap-2 text-sm text-white"
         >
-          <Volume2 className="w-5 h-5 text-white" />
+          <Repeat size={18} />
         </button>
 
-        <button className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition text-white text-sm font-medium">
-          <CheckCircle className="w-4 h-4" />
+        <button className="flex items-center gap-2 text-sm text-green-400">
+          <CheckCircle2 size={18} />
           Выучил
         </button>
       </div>
