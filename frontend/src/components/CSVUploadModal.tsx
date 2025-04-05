@@ -34,7 +34,7 @@ export default function CSVUploadModal() {
           setLoading(true)
           const formData = new FormData()
           formData.append('file', file)
-          await api.post('/words/upload-csv', formData)
+          await api.post('/words/upload-csv-test', formData)
           setSuccess('Файл успешно загружен!')
         } catch (err) {
           setError('Ошибка при загрузке файла.')

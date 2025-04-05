@@ -47,3 +47,10 @@ def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
         db.add(word)
     db.commit()
     return {"detail": "CSV successfully uploaded"}
+
+@router.post("/upload-csv-test")
+def upload_csv_test(file: UploadFile = File(...)):
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Нужен CSV-файл")
+        
+    return {"detail": f"Файл '{file.filename}' успешно получен"}
