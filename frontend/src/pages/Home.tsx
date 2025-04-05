@@ -1,90 +1,43 @@
-import { useState } from 'react'
-import { Volume2, Eye, Repeat2, Check } from 'lucide-react'
-import { speak } from '../utils/speak'
+import { useEffect, useState } from 'react'
+import { api } from '../utils/api'
+import WordCard from '../components/WordCard'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 
+export default function Home() {
+  const [words, setWords] = useState<any[]>([])
+  const [index, setIndex] = useState(0)
 
-interface WordCardProps {
-  word: {
-    id: number
-    word: string
-    transcription: string
-    translation: string
-    example: string
-    learned: boolean
-  }
-}
+  useEffect(() => {
+    api.get('/words').then((res) => setWords(res.data))
+  }, [])
 
-export default function WordCard({ word }: WordCardProps) {
-  const [isEnglish, setIsEnglish] = useState(true)
-  const [showTranslation, setShowTranslation] = useState(false)
+  const goNext = () => setIndex((prev) => (prev + 1) % words.length)
+  const goPrev = () => setIndex((prev) => (prev - 1 + words.length) % words.length)
 
-  const displayWord = isEnglish ? word.word : word.translation
-  const displayTranslation = isEnglish ? word.translation : word.word
-  const wordInExample = word.word
-
-  const exampleWithHighlight = word.example.split(new RegExp(`(${wordInExample})`, 'gi')).map((part, i) => {
-    const isTarget = part.toLowerCase() === wordInExample.toLowerCase()
-    return (
-      <span
-        key={i}
-        className={cn(
-          'font-semibold transition-all duration-300',
-          !isEnglish && !showTranslation && isTarget ? 'blur-sm opacity-60' : ''
-        )}
-      >
-        {part}
-      </span>
-    )
-  })
+  const current = words[index]
 
   return (
-    <div className="relative flex flex-col justify-between h-full p-6 rounded-3xl text-white overflow-hidden bg-gradient-to-br from-[#2C2C2C] to-[#1A1A1A] border border-white/10 shadow-xl">
-      {/* Верх */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="space-y-1">
-            <h2 className="text-3xl font-bold">{displayWord}</h2>
-            <p className="text-muted-foreground text-sm">{word.transcription}</p>
-          </div>
-          <button
-            onClick={() => speak(word.word)}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-          >
-            <Volume2 size={20} />
-          </button>
-        </div>
-
-        {/* Перевод */}
-        <p
-          className={cn(
-            'italic text-lg font-medium transition-all duration-300',
-            !showTranslation ? 'blur-sm opacity-60' : ''
-          )}
-        >
-          {displayTranslation}
-        </p>
-
-        {/* Пример */}
-        <p className="text-sm text-zinc-300">{exampleWithHighlight}</p>
+    <div className="flex flex-col h-screen max-w-[430px] mx-auto px-4 py-6">
+      <div className="flex-grow overflow-hidden">
+        {current ? <WordCard word={current} /> : null}
       </div>
 
-      {/* Контролы */}
-      <div className="mt-6 flex justify-between items-center gap-3">
-        <button
-          onClick={() => setIsEnglish(!isEnglish)}
-          className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+      <div className="flex gap-4 mt-6">
+        <Button
+          onClick={goPrev}
+          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-2xl bg-white/10 text-white"
         >
-          <Repeat2 size={20} />
-        </button>
-        <button
-          onClick={() => setShowTranslation(!showTranslation)}
-          className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+          <ArrowLeft className="w-5 h-5" />
+          Назад
+        </Button>
+        <Button
+          onClick={goNext}
+          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-2xl bg-white/10 text-white"
         >
-          <Eye size={20} />
-        </button>
-        <button className="flex items-center gap-2 text-sm bg-white/10 hover:bg-white/20 rounded-full px-3 py-2 transition">
-          <Check size={16} /> Выучил
-        </button>
+          <ArrowRight className="w-5 h-5" />
+          Вперёд
+        </Button>
       </div>
     </div>
   )
