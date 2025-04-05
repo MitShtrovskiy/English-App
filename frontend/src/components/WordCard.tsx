@@ -1,114 +1,100 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { Eye, Volume2, RefreshCcw, Check } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { speak } from '../utils/speak'
 import classNames from 'classnames'
 
-interface Word {
-  id: number
-  word: string
-  translation: string
-  example: string
-  transcription: string
-  learned: boolean
-}
-
-interface Props {
-  word: Word
-  isEnglish: boolean
-  hideTranslation: boolean
-  onToggleLanguage: () => void
+interface WordCardProps {
+  word: {
+    id: number
+    word: string
+    translation: string
+    example: string
+    transcription?: string
+  }
+  currentLang: 'en' | 'ru'
+  showTranslation: boolean
   onToggleTranslation: () => void
+  onToggleLanguage: () => void
   onMarkAsLearned: () => void
 }
 
-const gradients = [
-  'from-pink-500 via-red-500 to-yellow-500',
-  'from-purple-500 via-indigo-500 to-blue-500',
-  'from-teal-400 via-green-500 to-lime-500',
-  'from-orange-400 via-pink-500 to-red-500',
-  'from-cyan-400 via-sky-500 to-indigo-500',
-]
-
 export default function WordCard({
   word,
-  isEnglish,
-  hideTranslation,
-  onToggleLanguage,
+  currentLang,
+  showTranslation,
   onToggleTranslation,
+  onToggleLanguage,
   onMarkAsLearned,
-}: Props) {
-  const [gradientIndex] = useState(() => Math.floor(Math.random() * gradients.length))
-  const displayedWord = isEnglish ? word.word : word.translation
-  const translation = isEnglish ? word.translation : word.word
-  const wordInExample = isEnglish ? word.word : word.word
-  const example = word.example.replace(
-    new RegExp(`(${wordInExample})`, 'gi'),
-    (_, match) =>
-      hideTranslation && !isEnglish
-        ? `<span class="blur-sm bg-zinc-900/40 px-1 rounded">${match}</span>`
-        : `<strong>${match}</strong>`
+}: WordCardProps) {
+  const displayWord = currentLang === 'en' ? word.word : word.translation
+  const displayTranslation =
+    currentLang === 'en' ? word.translation : word.word
+
+  const shouldBlurExample =
+    currentLang === 'ru' && !showTranslation
+
+  const highlightedExample = word.example.replace(
+    new RegExp(`\\b${word.word}\\b`, 'gi'),
+    (match) =>
+      `<span class="${shouldBlurExample ? 'blur-sm text-transparent bg-white/10' : 'font-semibold'}">${match}</span>`
   )
 
   return (
     <motion.div
-      className={classNames(
-        'p-6 rounded-2xl text-white w-full shadow-xl space-y-4 border border-white/10',
-        'bg-gradient-to-br',
-        gradients[gradientIndex]
-      )}
-      initial={{ opacity: 0, y: 20 }}
+      className="w-full p-6 rounded-3xl space-y-4 shadow-xl text-left text-white border border-white/10"
+      style={{
+        background: 'linear-gradient(136deg, #4522FF 0%, #B63EFF 100%)',
+      }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      exit={{ opacity: 0, y: -30 }}
       layout
     >
-      <div className="space-y-1">
-        <div className="text-3xl font-bold">{displayedWord}</div>
-        <div className="text-sm text-white/80">{word.transcription}</div>
-        <div
-          className={classNames(
-            'text-lg',
-            hideTranslation ? 'blur-sm bg-black/30 px-2 py-1 rounded inline-block' : ''
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-bold">{displayWord}</h2>
+          {word.transcription && currentLang === 'en' && (
+            <p className="text-sm text-white/70">{word.transcription}</p>
           )}
-        >
-          {hideTranslation ? translation : translation}
         </div>
+        <button onClick={onToggleLanguage}>
+          <RefreshCcw className="w-5 h-5 text-white" />
+        </button>
       </div>
 
       <div
+        className={classNames(
+          'text-lg font-semibold transition-all relative',
+          !showTranslation && 'blur-sm text-transparent select-none'
+        )}
+      >
+        {displayTranslation}
+        {!showTranslation && (
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-md pointer-events-none" />
+        )}
+      </div>
+
+      <p
         className="text-sm text-white/90"
-        dangerouslySetInnerHTML={{ __html: example }}
+        dangerouslySetInnerHTML={{ __html: highlightedExample }}
       />
 
-      <div className="flex justify-between items-center pt-4 gap-3 flex-wrap">
-        <button
-          onClick={onToggleLanguage}
-          className="p-2 px-3 text-sm rounded-xl bg-white/10 hover:bg-white/20"
-        >
-          <RefreshCcw className="w-4 h-4 inline mr-1" />
-          Язык
-        </button>
-
-        <button
-          onClick={onToggleTranslation}
-          className="p-2 px-3 text-sm rounded-xl bg-white/10 hover:bg-white/20"
-        >
-          <Eye className="w-4 h-4 inline" />
-        </button>
-
-        <button
-          onClick={() => speak(word.word)}
-          className="p-2 px-3 text-sm rounded-xl bg-white/10 hover:bg-white/20"
-        >
-          <Volume2 className="w-4 h-4 inline" />
-        </button>
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex gap-4">
+          <button onClick={onToggleTranslation}>
+            <Eye className="w-5 h-5 text-white" />
+          </button>
+          <button onClick={() => speak(word.word)}>
+            <Volume2 className="w-5 h-5 text-white" />
+          </button>
+        </div>
 
         <button
           onClick={onMarkAsLearned}
-          className="p-2 px-3 text-sm rounded-xl bg-white/10 hover:bg-white/20"
+          className="flex items-center gap-2 bg-white/20 text-white text-sm px-4 py-2 rounded-2xl"
         >
-          <Check className="w-4 h-4 inline mr-1" />
-          Выучил
+          <Check className="w-4 h-4" /> Выучил
         </button>
       </div>
     </motion.div>
