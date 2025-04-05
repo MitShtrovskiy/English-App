@@ -1,63 +1,92 @@
+// src/pages/EditWordPage.tsx
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { api } from '@/utils/api'
-import { Button } from '@/components/ui/button'
+import { useParams, useNavigate } from 'react-router-dom'
+import { api } from '../utils/api'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
 
 export default function EditWordPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [form, setForm] = useState({
+  const [word, setWord] = useState({
     word: '',
     translation: '',
     transcription: '',
     example: '',
   })
-
-  const fetchWord = async () => {
-    const res = await api.get(`/words/${id}`)
-    setForm(res.data)
-  }
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchWord()
-  }, [])
+    if (id) {
+      api.get(`/words/${id}`).then((res) => {
+        setWord(res.data)
+      })
+    }
+  }, [id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setWord((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSave = async () => {
-    if (!form.word.trim() || !form.translation.trim()) return alert('Все поля обязательны')
-    await api.put(`/words/${id}`, form)
-    navigate('/words')
+  const handleSubmit = async () => {
+    if (!word.word.trim() || !word.translation.trim() || !word.example.trim()) {
+      setError('Все поля должны быть заполнены.')
+      return
+    }
+    await api.put(`/words/${id}`, word)
+    navigate('/word-list')
   }
 
   const handleDelete = async () => {
-    if (confirm('Удалить слово?')) {
-      await api.delete(`/words/${id}`)
-      navigate('/words')
-    }
+    await api.delete(`/words/${id}`)
+    navigate('/word-list')
   }
 
   return (
-    <div className="p-4 space-y-4 max-w-lg mx-auto">
-      <Button variant="ghost" onClick={() => navigate(-1)}>
-        ← Назад
-      </Button>
-
-      <Input placeholder="Слово" name="word" value={form.word} onChange={handleChange} required />
-      <Input placeholder="Перевод" name="translation" value={form.translation} onChange={handleChange} required />
-      <Input placeholder="Транскрипция" name="transcription" value={form.transcription} onChange={handleChange} />
-      <Textarea placeholder="Пример использования" name="example" value={form.example} onChange={handleChange} />
-
-      <div className="flex justify-between gap-2 pt-4">
+    <div className="max-w-[430px] mx-auto px-4 py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" onClick={() => navigate(-1)}>
+          ← Назад
+        </Button>
         <Button variant="destructive" onClick={handleDelete}>
           Удалить
         </Button>
-        <Button onClick={handleSave}>Сохранить</Button>
       </div>
+
+      <div className="space-y-4">
+        <Input
+          name="word"
+          placeholder="Слово"
+          value={word.word}
+          onChange={handleChange}
+        />
+        <Input
+          name="translation"
+          placeholder="Перевод"
+          value={word.translation}
+          onChange={handleChange}
+        />
+        <Input
+          name="transcription"
+          placeholder="Транскрипция"
+          value={word.transcription}
+          onChange={handleChange}
+        />
+        <Textarea
+          name="example"
+          placeholder="Пример использования"
+          value={word.example}
+          onChange={handleChange}
+        />
+      </div>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      <Button onClick={handleSubmit} className="w-full mt-4">
+        Сохранить
+      </Button>
     </div>
   )
 }
