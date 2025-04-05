@@ -1,0 +1,142 @@
+[
+  {
+    "text": "apple",
+    "transcription": "[ˈæpl]",
+    "translation": "яблоко",
+    "example": "She ate an apple for breakfast.",
+    "is_learned": false
+  },
+  {
+    "text": "book",
+    "transcription": "[bʊk]",
+    "translation": "книга",
+    "example": "He is reading a good book.",
+    "is_learned": false
+  },
+  {
+    "text": "car",
+    "transcription": "[kɑːr]",
+    "translation": "машина",
+    "example": "They drove a red car.",
+    "is_learned": false
+  },
+  {
+    "text": "dog",
+    "transcription": "[dɔg]",
+    "translation": "собака",
+    "example": "The dog barked all night.",
+    "is_learned": false
+  },
+  {
+    "text": "eat",
+    "transcription": "[iːt]",
+    "translation": "есть",
+    "example": "We eat lunch at noon.",
+    "is_learned": false
+  },
+  {
+    "text": "flower",
+    "transcription": "[ˈflaʊər]",
+    "translation": "цветок",
+    "example": "The flower is blooming.",
+    "is_learned": false
+  },
+  {
+    "text": "go",
+    "transcription": "[ɡəʊ]",
+    "translation": "идти",
+    "example": "I go to work every day.",
+    "is_learned": false
+  },
+  {
+    "text": "house",
+    "transcription": "[haʊs]",
+    "translation": "дом",
+    "example": "They live in a big house.",
+    "is_learned": false
+  },
+  {
+    "text": "ice",
+    "transcription": "[aɪs]",
+    "translation": "лёд",
+    "example": "There is ice on the lake.",
+    "is_learned": false
+  },
+  {
+    "text": "jump",
+    "transcription": "[dʒʌmp]",
+    "translation": "прыгать",
+    "example": "Kids love to jump on trampolines.",
+    "is_learned": false
+  },
+  {
+    "text": "key",
+    "transcription": "[kiː]",
+    "translation": "ключ",
+    "example": "She lost her car key.",
+    "is_learned": false
+  },
+  {
+    "text": "love",
+    "transcription": "[lʌv]",
+    "translation": "любовь",
+    "example": "Love is a powerful emotion.",
+    "is_learned": false
+  },
+  {
+    "text": "moon",
+    "transcription": "[muːn]",
+    "translation": "луна",
+    "example": "The moon is full tonight.",
+    "is_learned": false
+  },
+  {
+    "text": "night",
+    "transcription": "[naɪt]",
+    "translation": "ночь",
+    "example": "It was a cold night.",
+    "is_learned": false
+  },
+  {
+    "text": "open",
+    "transcription": "[ˈəʊpən]",
+    "translation": "открывать",
+    "example": "Please open the window.",
+    "is_learned": false
+  },
+  {
+    "text": "pen",
+    "transcription": "[pen]",
+    "translation": "ручка",
+    "example": "He wrote a note with a pen.",
+    "is_learned": false
+  },
+  {
+    "text": "question",
+    "transcription": "[ˈkwɛs.tʃən]",
+    "translation": "вопрос",
+    "example": "She asked a question.",
+    "is_learned": false
+  },
+  {
+    "text": "run",
+    "transcription": "[rʌn]",
+    "translation": "бегать",
+    "example": "I run every morning.",
+    "is_learned": false
+  },
+  {
+    "text": "sun",
+    "transcription": "[sʌn]",
+    "translation": "солнце",
+    "example": "The sun is shining.",
+    "is_learned": false
+  },
+  {
+    "text": "tree",
+    "transcription": "[triː]",
+    "translation": "дерево",
+    "example": "There is a tree in the yard.",
+    "is_learned": false
+  }
+]
