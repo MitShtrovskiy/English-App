@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { api } from '../utils/api'
 import WordCard from '../components/WordCard'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { api } from '../utils/api'
+import { ArrowLeft, ArrowRight, ListPlus, Upload } from 'lucide-react'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
@@ -12,52 +11,47 @@ export default function Home() {
     api.get('/words').then((res) => setWords(res.data))
   }, [])
 
-  const nextWord = () => {
+  const currentWord = words[index]
+
+  const next = () => {
     setIndex((prev) => (prev + 1) % words.length)
   }
 
-  const prevWord = () => {
+  const prev = () => {
     setIndex((prev) => (prev - 1 + words.length) % words.length)
   }
 
-  const currentWord = words[index]
-
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-background px-4 pt-4 pb-4 max-w-[430px] mx-auto overflow-hidden">
-      {/* Верхний навбар */}
-      <header className="flex justify-between items-center h-16 mb-4">
-        <Button variant="ghost" size="icon">
-          📋
-        </Button>
-        <Button variant="ghost" size="icon">
-          ⬆️
-        </Button>
+    <div className="relative min-h-screen flex flex-col px-4 pb-[env(safe-area-inset-bottom)] max-w-[430px] mx-auto bg-black overflow-hidden">
+      <header className="flex justify-between items-center px-2 py-4 z-10">
+        <button className="text-white p-2">
+          <ListPlus className="w-6 h-6" />
+        </button>
+        <button className="text-white p-2">
+          <Upload className="w-6 h-6" />
+        </button>
       </header>
 
-      {/* Контент карточки */}
-      {currentWord && (
-        <div className="flex-1 flex items-start justify-center">
-          <WordCard word={currentWord} />
-        </div>
-      )}
+      <main className="flex-grow flex items-start pt-2 justify-center">
+        {currentWord && <WordCard word={currentWord} />}
+      </main>
 
-      {/* Навигация */}
-      <div className="flex justify-between gap-4 mt-4">
-        <Button
-          onClick={prevWord}
-          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10 text-white"
+      <footer className="flex gap-4 mt-4 mb-8">
+        <button
+          className="flex flex-col justify-center items-center h-16 flex-1 gap-2 rounded-[20px] bg-white/10 text-white"
+          onClick={prev}
         >
-          <ChevronLeft />
+          <ArrowLeft className="w-5 h-5" />
           Назад
-        </Button>
-        <Button
-          onClick={nextWord}
-          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10 text-white"
+        </button>
+        <button
+          className="flex flex-col justify-center items-center h-16 flex-1 gap-2 rounded-[20px] bg-white/10 text-white"
+          onClick={next}
         >
-          <ChevronRight />
+          <ArrowRight className="w-5 h-5" />
           Вперёд
-        </Button>
-      </div>
+        </button>
+      </footer>
     </div>
   )
 }
