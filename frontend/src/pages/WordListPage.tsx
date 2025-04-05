@@ -1,54 +1,60 @@
+// src/pages/WordListPage.tsx
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 import { api } from '@/utils/api'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
 
-export default function EditWordPage() {
-  const { id } = useParams()
+interface Word {
+  id: number
+  word: string
+  translation: string
+  learned: boolean
+}
+
+export default function WordListPage() {
+  const [words, setWords] = useState<Word[]>([])
+  const [search, setSearch] = useState('')
   const navigate = useNavigate()
-  const [wordData, setWordData] = useState({
-    word: '',
-    translation: '',
-    transcription: '',
-    example: '',
-  })
 
-  useEffect(() => {
-    api.get(`/words/${id}`).then((res) => setWordData(res.data))
-  }, [id])
-
-  const handleSave = () => {
-    api.patch(`/words/${id}`, wordData).then(() => navigate('/list'))
+  const fetchWords = () => {
+    api.get('/words').then((res) => setWords(res.data))
   }
 
-  return (
-    <div className="max-w-[430px] mx-auto px-4 pt-6 text-white">
-      <h1 className="text-xl font-bold mb-4">Редактировать слово</h1>
+  useEffect(() => {
+    fetchWords()
+  }, [])
 
-      <div className="space-y-4">
-        <Input
-          placeholder="Слово"
-          value={wordData.word}
-          onChange={(e) => setWordData({ ...wordData, word: e.target.value })}
-        />
-        <Input
-          placeholder="Перевод"
-          value={wordData.translation}
-          onChange={(e) => setWordData({ ...wordData, translation: e.target.value })}
-        />
-        <Input
-          placeholder="Транскрипция"
-          value={wordData.transcription}
-          onChange={(e) => setWordData({ ...wordData, transcription: e.target.value })}
-        />
-        <Textarea
-          placeholder="Пример использования"
-          value={wordData.example}
-          onChange={(e) => setWordData({ ...wordData, example: e.target.value })}
-        />
-        <Button onClick={handleSave}>Сохранить</Button>
+  const filteredWords = words.filter((word) =>
+    word.word.toLowerCase().includes(search.toLowerCase()) ||
+    word.translation.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <div className="p-4 max-w-[430px] mx-auto">
+      <div className="flex justify-between items-center mb-4">
+        <Button onClick={() => navigate(-1)} variant="ghost">Назад</Button>
+        <h1 className="text-xl font-bold">Список слов</h1>
+      </div>
+
+      <Input
+        placeholder="Поиск..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="mb-4"
+      />
+
+      <div className="space-y-2">
+        {filteredWords.map((word) => (
+          <div
+            key={word.id}
+            className={`p-4 rounded-lg border cursor-pointer transition hover:bg-zinc-800 ${word.learned ? 'opacity-50' : ''}`}
+            onClick={() => navigate(`/edit/${word.id}`)}
+          >
+            <div className="text-base font-semibold">{word.word}</div>
+            <div className="text-sm text-muted-foreground">{word.translation}</div>
+          </div>
+        ))}
       </div>
     </div>
   )
