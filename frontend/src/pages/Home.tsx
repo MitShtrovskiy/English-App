@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
 import WordCard from '../components/WordCard'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
@@ -12,30 +12,44 @@ export default function Home() {
     api.get('/words').then((res) => setWords(res.data))
   }, [])
 
-  const goNext = () => setIndex((prev) => (prev + 1) % words.length)
-  const goPrev = () => setIndex((prev) => (prev - 1 + words.length) % words.length)
+  const nextWord = () => {
+    setIndex((prev) => (prev + 1) % words.length)
+  }
 
-  const current = words[index]
+  const prevWord = () => {
+    setIndex((prev) => (prev - 1 + words.length) % words.length)
+  }
+
+  const currentWord = words[index]
 
   return (
-    <div className="flex flex-col h-screen max-w-[430px] mx-auto px-4 py-6">
-      <div className="flex-grow overflow-hidden">
-        {current ? <WordCard word={current} /> : null}
+    <div className="h-[100dvh] pb-24 pt-6 px-4 max-w-[430px] mx-auto flex flex-col justify-between items-stretch overflow-hidden">
+      <div className="flex-1">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentWord?.id}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.3 }}
+            className="h-full"
+          >
+            {currentWord && <WordCard word={currentWord} />}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      <div className="flex gap-4 mt-6">
+      <div className="flex justify-between gap-4 mt-6">
         <Button
-          onClick={goPrev}
-          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-2xl bg-white/10 text-white"
+          onClick={prevWord}
+          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10"
         >
-          <ArrowLeft className="w-5 h-5" />
           Назад
         </Button>
         <Button
-          onClick={goNext}
-          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-2xl bg-white/10 text-white"
+          onClick={nextWord}
+          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10"
         >
-          <ArrowRight className="w-5 h-5" />
           Вперёд
         </Button>
       </div>
