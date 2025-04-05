@@ -2,6 +2,7 @@
 import { useNavigate } from 'react-router-dom'
 import { List, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import React from 'react'
 
 export default function Navbar() {
   const navigate = useNavigate()
@@ -16,4 +17,12 @@ export default function Navbar() {
       </Button>
     </div>
   )
+  export const Navbar = () => {
+    return (
+      <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
+        <button className="text-lg">Список слов</button>
+        <button className="text-lg">Загрузить новые слова</button>
+      </div>
+    )
+  }
 }
