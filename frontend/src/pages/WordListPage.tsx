@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 
+
 interface Word {
   id: number
   word: string
