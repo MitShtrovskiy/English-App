@@ -17,12 +17,12 @@ export default function Navbar() {
       </Button>
     </div>
   )
-  export const Navbar = () => {
-    return (
-      <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
-        <button className="text-lg">Список слов</button>
-        <button className="text-lg">Загрузить новые слова</button>
-      </div>
-    )
-  }
+}
+export const Navbar = () => {
+  return (
+    <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
+      <button className="text-lg">Список слов</button>
+      <button className="text-lg">Загрузить новые слова</button>
+    </div>
+  )
 }
