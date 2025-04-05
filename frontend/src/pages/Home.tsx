@@ -23,7 +23,8 @@ export default function Home() {
   const currentWord = words[index]
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-background px-4 pt-4 pb-8 max-w-[430px] mx-auto overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-between bg-background px-4 pt-4 pb-4 max-w-[430px] mx-auto overflow-hidden">
+      {/* Верхний навбар */}
       <header className="flex justify-between items-center h-16 mb-4">
         <Button variant="ghost" size="icon">
           📋
@@ -33,12 +34,14 @@ export default function Home() {
         </Button>
       </header>
 
+      {/* Контент карточки */}
       {currentWord && (
         <div className="flex-1 flex items-start justify-center">
           <WordCard word={currentWord} />
         </div>
       )}
 
+      {/* Навигация */}
       <div className="flex justify-between gap-4 mt-4">
         <Button
           onClick={prevWord}

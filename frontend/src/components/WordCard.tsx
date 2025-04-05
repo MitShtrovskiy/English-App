@@ -61,7 +61,7 @@ export default function WordCard({ word }: WordCardProps) {
   return (
     <motion.div
       className={`rounded-3xl p-6 w-full h-full flex flex-col justify-between text-left border border-white/10 bg-gradient-to-br ${gradient} bg-clip-padding backdrop-blur-xl bg-opacity-60`}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4, ease: 'easeInOut' }}
@@ -81,6 +81,7 @@ export default function WordCard({ word }: WordCardProps) {
         <p className="mt-4 text-sm text-white/90 leading-relaxed">{highlightExample()}</p>
       </div>
 
+      {/* Контролы */}
       <div className="flex justify-between items-center mt-6 gap-2 flex-wrap">
         <div className="flex gap-2">
           <Button variant="ghost" onClick={() => setIsHidden(!isHidden)} size="icon">
