@@ -4,7 +4,23 @@ from app.routers import words  # Роутер с эндпоинтами /words
 from app.database import SessionLocal
 from app import models
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+# Добавим CORS и заголовки
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.middleware("http")
+async def add_charset_header(request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    return response
 
 # CORS: разрешаем фронту обращаться к API
 app.add_middleware(
