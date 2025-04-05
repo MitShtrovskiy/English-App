@@ -1,12 +1,12 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from app.database import Base
+from .database import Base
 
 class Word(Base):
     __tablename__ = "words"
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(String, index=True)
+    word = Column(String, nullable=False)
     transcription = Column(String)
-    translation = Column(String)
+    translation = Column(String, nullable=False)
     example = Column(String)
-    is_learned = Column(Boolean, default=False)
+    learned = Column(Boolean, default=False)
