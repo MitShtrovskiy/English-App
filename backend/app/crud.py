@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app import models, schemas
+from app import models
 
 def get_words(db: Session):
     return db.query(models.Word).all()

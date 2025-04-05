@@ -31,12 +31,12 @@ def populate_initial_data():
                 crud.create_word(db, word)
     db.close()
 
-# ✅ Новый маршрут — проверка
+# Проверочный маршрут
 @app.get("/")
 def root():
     return {"message": "Backend is working"}
 
-# ✅ Новый маршрут — получить список слов
+# Получить список всех слов
 @app.get("/words/", response_model=list[schemas.Word])
 def get_all_words():
     db = SessionLocal()
