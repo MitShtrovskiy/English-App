@@ -1,10 +1,19 @@
-import { Link } from 'react-router-dom'
-import { BookOpen, Home, Upload } from 'lucide-react'
+// src/components/Navbar.tsx
+import { useNavigate } from 'react-router-dom'
+import { List, Download } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
-export const Navbar = () => (
-  <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white py-3 px-6 flex justify-between">
-    <Link to="/"><Home /></Link>
-    <Link to="/dictionary"><BookOpen /></Link>
-    <Link to="/upload"><Upload /></Link>
-  </nav>
-)
+export default function Navbar() {
+  const navigate = useNavigate()
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 h-14 px-4 flex items-center justify-between bg-zinc-900/70 backdrop-blur-md border-b border-zinc-800 max-w-[430px] mx-auto">
+      <Button variant="ghost" size="icon" onClick={() => navigate('/word-list')}>
+        <List className="w-5 h-5" />
+      </Button>
+      <Button variant="ghost" size="icon" onClick={() => alert('Загрузка новых слов')}>
+        <Download className="w-5 h-5" />
+      </Button>
+    </div>
+  )
+}

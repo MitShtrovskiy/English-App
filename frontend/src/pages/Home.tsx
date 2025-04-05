@@ -1,57 +1,65 @@
 import { useEffect, useState } from 'react'
-import WordCard from '../components/WordCard'
 import { api } from '../utils/api'
-import { ArrowLeft, ArrowRight, ListPlus, Upload } from 'lucide-react'
+import WordCard from '../components/WordCard'
+import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Navbar from '../components/Navbar'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    api.get('/words').then((res) => setWords(res.data))
+    api.get('/words').then((res) => {
+      const notLearnedWords = res.data.filter((word: any) => !word.learned)
+      setWords(notLearnedWords)
+      setIndex(0)
+    })
   }, [])
 
-  const currentWord = words[index]
-
-  const next = () => {
+  const handleNext = () => {
     setIndex((prev) => (prev + 1) % words.length)
   }
 
-  const prev = () => {
+  const handlePrev = () => {
     setIndex((prev) => (prev - 1 + words.length) % words.length)
   }
 
+  if (!words.length) {
+    return (
+      <>
+        <Navbar />
+        <div className="pt-16 flex items-center justify-center h-screen text-white">
+          Нет слов для изучения
+        </div>
+      </>
+    )
+  }
+
   return (
-    <div className="relative min-h-screen flex flex-col px-4 pb-[env(safe-area-inset-bottom)] max-w-[430px] mx-auto bg-black overflow-hidden">
-      <header className="flex justify-between items-center px-2 py-4 z-10">
-        <button className="text-white p-2">
-          <ListPlus className="w-6 h-6" />
-        </button>
-        <button className="text-white p-2">
-          <Upload className="w-6 h-6" />
-        </button>
-      </header>
-
-      <main className="flex-grow flex items-start pt-2 justify-center">
-        {currentWord && <WordCard word={currentWord} />}
-      </main>
-
-      <footer className="flex gap-4 mt-4 mb-8">
-        <button
-          className="flex flex-col justify-center items-center h-16 flex-1 gap-2 rounded-[20px] bg-white/10 text-white"
-          onClick={prev}
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Назад
-        </button>
-        <button
-          className="flex flex-col justify-center items-center h-16 flex-1 gap-2 rounded-[20px] bg-white/10 text-white"
-          onClick={next}
-        >
-          <ArrowRight className="w-5 h-5" />
-          Вперёд
-        </button>
-      </footer>
-    </div>
+    <>
+      <Navbar />
+      <div className="pt-16 h-[calc(100vh-64px)] flex flex-col justify-between max-w-[430px] mx-auto px-4">
+        <div className="flex-1 flex items-center justify-center">
+          <WordCard word={words[index]} />
+        </div>
+        <div className="flex gap-4 pb-6">
+          <Button
+            onClick={handlePrev}
+            className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10 text-white text-base"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Назад
+          </Button>
+          <Button
+            onClick={handleNext}
+            className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10 text-white text-base"
+          >
+            <ChevronRight className="w-5 h-5" />
+            Вперёд
+          </Button>
+        </div>
+      </div>
+    </>
   )
 }
