@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Volume2, Eye, Repeat2, Check } from 'lucide-react'
 import { speak } from '../utils/speak'
-import { cn } from '../utils/cn'
+
 
 interface WordCardProps {
   word: {
