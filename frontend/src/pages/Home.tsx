@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
-import TinderCard from 'react-tinder-card'
 import WordCard from '../components/WordCard'
+import TinderCard from 'react-tinder-card'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
@@ -20,25 +20,21 @@ export default function Home() {
     }
   }
 
-  const unlearnedWords = words.filter((word) => !word.learned)
-
   return (
     <div className="relative h-[90vh] flex items-center justify-center max-w-[430px] mx-auto">
-      {unlearnedWords.map((word) => (
-        <TinderCard
-          key={word.id}
-          preventSwipe={['up', 'down']}
-          onSwipe={(dir) => handleSwipe(dir, word.id)}
-          className="absolute w-[90%] max-w-md"
-        >
-          <WordCard word={word} />
-        </TinderCard>
-      ))}
-      {unlearnedWords.length === 0 && (
-        <div className="text-center text-muted-foreground text-xl">
-          Все слова выучены 🎉
-        </div>
-      )}
+      {words
+        .filter((word) => !word.learned)
+        .map((word) => (
+          <TinderCard
+            key={word.id}
+            onSwipe={(dir) => handleSwipe(dir, word.id)}
+            preventSwipe={['up', 'down']}
+          >
+            <div className="absolute w-full px-4">
+              <WordCard word={word} />
+            </div>
+          </TinderCard>
+        ))}
     </div>
   )
 }
