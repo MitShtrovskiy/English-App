@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import WordCard from '../components/WordCard'
 import { api } from '../utils/api'
+import WordCard from '../components/WordCard'
 import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
@@ -11,30 +12,46 @@ export default function Home() {
     api.get('/words').then((res) => setWords(res.data))
   }, [])
 
-  const next = () => setIndex((prev) => (prev + 1) % words.length)
-  const prev = () => setIndex((prev) => (prev - 1 + words.length) % words.length)
+  const nextWord = () => {
+    setIndex((prev) => (prev + 1) % words.length)
+  }
 
-  const word = words[index]
+  const prevWord = () => {
+    setIndex((prev) => (prev - 1 + words.length) % words.length)
+  }
+
+  const currentWord = words[index]
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden flex flex-col max-w-[430px] mx-auto">
-      {/* Навбар */}
-      <div className="h-16 px-4 flex items-center justify-between bg-black/60 backdrop-blur-lg border-b border-white/10">
-        <Button variant="ghost">📄 Список</Button>
-        <Button variant="ghost">⬆️ Загрузить</Button>
-      </div>
+    <div className="min-h-screen flex flex-col justify-between bg-background px-4 pt-4 pb-8 max-w-[430px] mx-auto overflow-hidden">
+      <header className="flex justify-between items-center h-16 mb-4">
+        <Button variant="ghost" size="icon">
+          📋
+        </Button>
+        <Button variant="ghost" size="icon">
+          ⬆️
+        </Button>
+      </header>
 
-      {/* Контент карточки */}
-      <div className="flex-1 flex items-center justify-center px-4 py-6">
-        {word && <WordCard key={word.id} word={word} />}
-      </div>
+      {currentWord && (
+        <div className="flex-1 flex items-start justify-center">
+          <WordCard word={currentWord} />
+        </div>
+      )}
 
-      {/* Навигация */}
-      <div className="px-4 pb-6 flex justify-between gap-4">
-        <Button onClick={prev} className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-2xl bg-white/10">
+      <div className="flex justify-between gap-4 mt-4">
+        <Button
+          onClick={prevWord}
+          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10 text-white"
+        >
+          <ChevronLeft />
           Назад
         </Button>
-        <Button onClick={next} className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-2xl bg-white/10">
+        <Button
+          onClick={nextWord}
+          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10 text-white"
+        >
+          <ChevronRight />
           Вперёд
         </Button>
       </div>
