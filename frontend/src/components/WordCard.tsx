@@ -1,7 +1,9 @@
-import { Volume2, CheckCircle } from 'lucide-react'
-import { api } from '../utils/api'
+import { motion } from "framer-motion"
+import { Switch } from "@/components/ui/switch"
+import { useState } from "react"
+import { api } from "@/utils/api"
 
-interface Word {
+type Word = {
   id: number
   word: string
   transcription: string
@@ -10,44 +12,43 @@ interface Word {
   learned: boolean
 }
 
-export default function WordCard({ word: w, onToggle }: { word: Word; onToggle: () => void }) {
-  const handleSpeak = () => {
-    const utterance = new SpeechSynthesisUtterance(w.word)
-    utterance.lang = 'en-US'
-    speechSynthesis.speak(utterance)
-  }
+type WordCardProps = {
+  word: Word
+  onStatusChange?: (id: number, learned: boolean) => void
+}
 
-  const toggleLearned = async () => {
-    await api.patch(`/words/${w.id}`, { learned: !w.learned })
-    onToggle()
+export default function WordCard({ word, onStatusChange }: WordCardProps) {
+  const [isLearned, setIsLearned] = useState(word.learned)
+  const [loading, setLoading] = useState(false)
+
+  const toggleLearned = async (checked: boolean) => {
+    setIsLearned(checked)
+    setLoading(true)
+    try {
+      await api.patch(`/words/${word.id}`, { learned: checked })
+      onStatusChange?.(word.id, checked)
+    } catch (err) {
+      console.error("Ошибка при обновлении статуса:", err)
+      setIsLearned(!checked) // откат при ошибке
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="bg-surface p-4 rounded-2xl shadow-card space-y-2">
+    <motion.div
+      className="p-4 bg-muted rounded-2xl shadow-md space-y-2"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">{w.word}</h2>
-        <span className="text-muted text-sm">{w.transcription}</span>
+        <h2 className="text-lg font-bold">{word.word}</h2>
+        <Switch checked={isLearned} onCheckedChange={toggleLearned} disabled={loading} />
       </div>
-      <div className="text-lg text-primary">{w.translation}</div>
-      <p className="text-sm text-muted italic">"{w.example}"</p>
-      <div className="flex justify-between pt-2">
-        <button
-          onClick={handleSpeak}
-          className="text-muted hover:text-primary transition"
-          title="Прослушать"
-        >
-          <Volume2 />
-        </button>
-        <button
-          onClick={toggleLearned}
-          className={`flex items-center gap-1 text-sm ${
-            w.learned ? 'text-green-400' : 'text-muted'
-          }`}
-        >
-          <CheckCircle size={18} />
-          {w.learned ? 'Выучено' : 'Отметить'}
-        </button>
-      </div>
-    </div>
+      <p className="text-muted-foreground text-sm">{word.transcription}</p>
+      <p className="text-base">{word.translation}</p>
+      <p className="text-sm italic opacity-70">{word.example}</p>
+    </motion.div>
   )
 }
