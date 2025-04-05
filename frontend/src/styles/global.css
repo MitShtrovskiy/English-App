@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply bg-background text-white font-sans;
+}
+
+html {
+  font-size: 16px;
+}
