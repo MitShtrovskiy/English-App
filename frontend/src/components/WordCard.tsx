@@ -2,28 +2,32 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Volume2, EyeOff, RefreshCcw, Check } from 'lucide-react'
-import { speak } from '../utils/speak'
 
 interface WordCardProps {
   word: {
     id: number
     word: string
     translation: string
-    transcription?: string
     example: string
+    transcription?: string
     learned: boolean
   }
-  onLearned?: () => void
 }
 
-export default function WordCard({ word, onLearned }: WordCardProps) {
+export default function WordCard({ word }: WordCardProps) {
   const [isTranslationHidden, setIsTranslationHidden] = useState(true)
   const [isEnglishFirst, setIsEnglishFirst] = useState(true)
 
-  const showTranslation = !isTranslationHidden
-  const isRussian = !isEnglishFirst
-  const displayWord = isEnglishFirst ? word.word : word.translation
-  const displayTranslation = isEnglishFirst ? word.translation : word.word
+  const textToDisplay = isEnglishFirst ? word.word : word.translation
+  const translation = isEnglishFirst ? word.translation : word.word
+
+  const gradient = `linear-gradient(135deg, #C2E9FB, #D4FC79)` // можешь заменить на динамический
+
+  const playAudio = () => {
+    const utterance = new SpeechSynthesisUtterance(word.word)
+    utterance.lang = 'en-US'
+    speechSynthesis.speak(utterance)
+  }
 
   const highlightWordInExample = () => {
     const regex = new RegExp(`\\b${word.word}\\b`, 'gi')
@@ -36,14 +40,14 @@ export default function WordCard({ word, onLearned }: WordCardProps) {
           <span key={i}>
             {part}
             {matches && matches[i] && (
-              <span className="relative font-bold text-white">
-                {isRussian && !showTranslation ? (
-                  <>
-                    <span>{matches[i]}</span>
-                    <span className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm rounded-sm" />
-                  </>
+              <span className="relative font-medium">
+                {isEnglishFirst || !isTranslationHidden ? (
+                  <span className="text-white font-bold">{matches[i]}</span>
                 ) : (
-                  matches[i]
+                  <span className="relative">
+                    <span className="text-white font-bold">{matches[i]}</span>
+                    <span className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm rounded-sm" />
+                  </span>
                 )}
               </span>
             )}
@@ -55,46 +59,49 @@ export default function WordCard({ word, onLearned }: WordCardProps) {
 
   return (
     <motion.div
-      className="flex flex-col justify-between h-full bg-gradient-to-br from-[#1E1E1E] via-[#2C2C2C] to-[#1A1A1A] rounded-3xl shadow-xl px-6 py-8 space-y-6 border border-zinc-800"
-      initial={{ opacity: 0, y: 24 }}
+      className="w-full h-full rounded-3xl p-6 shadow-xl text-white flex flex-col justify-between"
+      style={{
+        background: gradient,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+      initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -24 }}
-      layout
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-      <div className="space-y-1 text-left">
-        <h2 className="text-2xl font-bold text-white break-words">{displayWord}</h2>
+      {/* Верхняя часть */}
+      <div className="space-y-2">
+        <h2 className="text-3xl font-bold leading-tight">{textToDisplay}</h2>
         {word.transcription && isEnglishFirst && (
-          <p className="text-sm text-muted-foreground">{word.transcription}</p>
+          <p className="text-sm text-white/80">{word.transcription}</p>
         )}
         <p
-          className={`italic text-muted-foreground text-sm transition duration-300 ${
+          className={`italic text-white/70 text-sm relative inline-block transition duration-300 ${
             isTranslationHidden ? 'blur-sm select-none' : ''
           }`}
         >
-          {displayTranslation}
+          {translation}
         </p>
       </div>
 
-      <p className="text-sm text-zinc-300 leading-relaxed">{highlightWordInExample()}</p>
+      {/* Пример */}
+      <div className="text-sm text-white/90 mt-4 leading-relaxed">{highlightWordInExample()}</div>
 
-      <div className="flex justify-between items-center mt-4 gap-2 flex-wrap">
+      {/* Контролы */}
+      <div className="flex justify-between items-center mt-6 gap-2 flex-wrap pt-6">
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setIsTranslationHidden(!isTranslationHidden)}>
+          <Button variant="ghost" onClick={() => setIsTranslationHidden(!isTranslationHidden)} size="icon">
             <EyeOff className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => speak(word.word)}>
+          <Button variant="ghost" onClick={playAudio} size="icon">
             <Volume2 className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => setIsEnglishFirst(!isEnglishFirst)}>
+          <Button variant="ghost" onClick={() => setIsEnglishFirst(!isEnglishFirst)} size="icon">
             <RefreshCcw className="w-5 h-5" />
           </Button>
         </div>
 
-        <Button
-          variant="outline"
-          className="ml-auto text-sm"
-          onClick={onLearned}
-        >
+        <Button variant="outline" className="ml-auto text-sm bg-white/10 backdrop-blur-md">
           <Check className="w-4 h-4 mr-2" />
           Выучил
         </Button>
