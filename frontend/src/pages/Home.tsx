@@ -21,9 +21,11 @@ export default function Home() {
   }
 
   return (
-    <div className="relative h-[90vh] flex items-center justify-center max-w-[430px] mx-auto">
+    <div className="relative h-[90vh] overflow-hidden flex items-center justify-center max-w-[430px] mx-auto">
       {words
         .filter((word) => !word.learned)
+        .slice()
+        .reverse() // ⬅️ Вот эта строка!
         .map((word) => (
           <TinderCard
             key={word.id}

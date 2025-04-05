@@ -12,6 +12,8 @@ interface WordCardProps {
 }
 
 export default function WordCard({ word }: WordCardProps) {
+  if (!word) return null // 🛡️ Предотвращает падение рендера
+  
   return (
     <motion.div
       className="bg-zinc-900 rounded-2xl shadow-xl p-6 space-y-4 w-full border border-zinc-800"
@@ -24,7 +26,7 @@ export default function WordCard({ word }: WordCardProps) {
         <h2 className="text-2xl font-bold leading-tight text-white">
           {word.word}
         </h2>
-        <Switch checked={word.learned} disabled /> {/* Пока заглушка */}
+        <Switch checked={word.learned} disabled />
       </div>
       <p className="text-muted-foreground italic text-sm">
         {word.translation}
