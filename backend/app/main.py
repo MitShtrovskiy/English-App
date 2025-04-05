@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base, SessionLocal
-from app import models, crud
-import json
+from app import models, crud, schemas
 from pathlib import Path
+import json
 
 app = FastAPI()
 
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,9 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Создание таблиц
 Base.metadata.create_all(bind=engine)
 
-# Добавим слова из JSON при старте, если БД пуста
+# Автозагрузка слов
 @app.on_event("startup")
 def populate_initial_data():
     db = SessionLocal()
@@ -28,3 +30,16 @@ def populate_initial_data():
             for word in words:
                 crud.create_word(db, word)
     db.close()
+
+# ✅ Новый маршрут — проверка
+@app.get("/")
+def root():
+    return {"message": "Backend is working"}
+
+# ✅ Новый маршрут — получить список слов
+@app.get("/words/", response_model=list[schemas.Word])
+def get_all_words():
+    db = SessionLocal()
+    words = crud.get_words(db)
+    db.close()
+    return words
