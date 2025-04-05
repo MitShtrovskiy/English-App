@@ -7,7 +7,7 @@ import { Navbar } from './components/Navbar'
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen pb-16">
+      <div className="min-h-screen bg-background pb-20">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dictionary" element={<Dictionary />} />

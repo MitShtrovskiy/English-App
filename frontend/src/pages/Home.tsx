@@ -1,25 +1,22 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
+import WordCard from '../components/WordCard'
 
 export default function Home() {
-  const [words, setWords] = useState([])
+  const [words, setWords] = useState<any[]>([])
+
+  const fetchWords = () => {
+    api.get('/words').then((res) => setWords(res.data))
+  }
 
   useEffect(() => {
-    api.get('/words').then(res => setWords(res.data))
+    fetchWords()
   }, [])
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl mb-4">Ежедневная практика</h1>
-      {words.map((word: any) => (
-        <div key={word.id} className="mb-4 p-4 bg-gray-800 rounded-xl shadow">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold">{word.word}</h2>
-            <span className="text-sm text-gray-400">{word.transcription}</span>
-          </div>
-          <p className="text-gray-300 mt-2">{word.translation}</p>
-          <p className="text-gray-500 text-sm mt-1 italic">"{word.example}"</p>
-        </div>
+    <div className="p-4 space-y-4 mb-20 max-w-[430px] mx-auto">
+      {words.map((word) => (
+        <WordCard key={word.id} word={word} onToggle={fetchWords} />
       ))}
     </div>
   )
