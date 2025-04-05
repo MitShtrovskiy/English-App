@@ -1,34 +1,44 @@
-// ✅ В WordCard.tsx
-import { motion } from 'framer-motion'
-import { Switch } from '@/components/ui/switch'
+import { useEffect, useState } from 'react'
+import { api } from '../utils/api'
+import TinderCard from 'react-tinder-card'
+import WordCard from '../components/WordCard'
 
-interface WordCardProps {
-  word: {
-    id: number
-    word: string
-    translation: string
-    example: string
-    learned: boolean
+export default function Home() {
+  const [words, setWords] = useState<any[]>([])
+
+  const fetchWords = () => {
+    api.get('/words').then((res) => setWords(res.data))
   }
-}
 
-const WordCard = ({ word }: WordCardProps) => {
+  useEffect(() => {
+    fetchWords()
+  }, [])
+
+  const handleSwipe = (dir: string, wordId: number) => {
+    if (dir === 'right') {
+      api.patch(`/words/${wordId}`, { learned: true }).then(fetchWords)
+    }
+  }
+
+  const unlearnedWords = words.filter((word) => !word.learned)
+
   return (
-    <motion.div
-      className="bg-zinc-900 rounded-2xl shadow-lg p-6 space-y-3 w-full"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      layout
-    >
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{word.word}</h2>
-        <Switch checked={word.learned} disabled />
-      </div>
-      <p className="text-muted-foreground text-sm italic">"{word.translation}"</p>
-      <p className="text-sm text-zinc-300">{word.example}</p>
-    </motion.div>
+    <div className="relative h-[90vh] flex items-center justify-center max-w-[430px] mx-auto">
+      {unlearnedWords.map((word) => (
+        <TinderCard
+          key={word.id}
+          preventSwipe={['up', 'down']}
+          onSwipe={(dir) => handleSwipe(dir, word.id)}
+          className="absolute w-[90%] max-w-md"
+        >
+          <WordCard word={word} />
+        </TinderCard>
+      ))}
+      {unlearnedWords.length === 0 && (
+        <div className="text-center text-muted-foreground text-xl">
+          Все слова выучены 🎉
+        </div>
+      )}
+    </div>
   )
 }
-
-export default WordCard // 👈 теперь можно импортировать по умолчанию
