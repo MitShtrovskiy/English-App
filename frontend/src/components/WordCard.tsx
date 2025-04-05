@@ -1,89 +1,123 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Volume2, Eye, EyeOff, Repeat2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Volume2, Eye, EyeOff, Repeat, CheckCircle } from 'lucide-react'
 
 interface Word {
   id: number
   word: string
-  transcription: string
   translation: string
+  transcription?: string
   example: string
   learned: boolean
 }
 
-interface Props {
+interface WordCardProps {
   word: Word
 }
 
-export default function WordCard({ word }: Props) {
-  const [showTranslation, setShowTranslation] = useState(true)
-  const [showEnglish, setShowEnglish] = useState(true)
+export default function WordCard({ word }: WordCardProps) {
+  const [isEnglish, setIsEnglish] = useState(true)
+  const [isTranslationHidden, setIsTranslationHidden] = useState(true)
 
-  const highlightedExample = (showEnglish ? word.example : word.translation).replace(
-    new RegExp(`\\b${word.word}\\b`, 'gi'),
-    (match) => `<strong>${match}</strong>`
-  )
-
-  const speak = () => {
-    const utterance = new SpeechSynthesisUtterance(word.word)
+  const speak = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = 'en-US'
     speechSynthesis.speak(utterance)
   }
 
+  const highlight = (example: string, word: string) =>
+    example.replace(
+      new RegExp(`\\b${word}\\b`, 'gi'),
+      (match) =>
+        `<strong class="${
+          isEnglish ? 'text-white' : 'blur-sm text-transparent'
+        } transition-all duration-500">${match}</strong>`
+    )
+
   return (
     <motion.div
-      className="bg-zinc-900 rounded-3xl shadow-2xl p-6 space-y-4 text-white w-full max-w-sm border border-zinc-800"
+      className="bg-zinc-900 rounded-2xl shadow-xl p-6 space-y-4 w-full border border-zinc-800 text-left"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       layout
     >
-      {/* Заголовок */}
-      <div className="text-center space-y-1">
-        <h2 className="text-3xl font-bold">{word.word}</h2>
-        <p className="text-muted-foreground text-sm italic">{word.transcription}</p>
-      </div>
+      <div className="flex justify-between items-center">
+        <div>
+          <AnimatePresence mode="wait">
+            <motion.h2
+              key={isEnglish ? 'eng' : 'rus'}
+              className="text-2xl font-bold leading-tight text-white"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {isEnglish ? word.word : word.translation}
+            </motion.h2>
+          </AnimatePresence>
 
-      {/* Перевод с блюром */}
-      <div className="relative">
-        <div className="bg-zinc-800 text-center rounded-xl py-2 text-lg font-medium">
-          {word.translation}
+          {isEnglish && word.transcription && (
+            <span className="text-sm text-muted-foreground ml-1">
+              [{word.transcription}]
+            </span>
+          )}
         </div>
-        {!showTranslation && (
-          <div className="absolute inset-0 rounded-xl backdrop-blur-sm bg-zinc-900/40" />
-        )}
-      </div>
-
-      {/* Пример */}
-      <div
-        className="text-sm text-zinc-300"
-        dangerouslySetInnerHTML={{ __html: highlightedExample }}
-      />
-
-      {/* Контролы */}
-      <div className="flex justify-between items-center mt-4">
         <button
-          onClick={() => setShowEnglish((prev) => !prev)}
-          className="p-2 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition"
+          onClick={() => setIsEnglish((prev) => !prev)}
+          className="text-muted-foreground hover:text-white"
           title="Сменить язык"
         >
-          <Repeat2 size={20} />
+          <Repeat className="w-5 h-5" />
         </button>
+      </div>
 
-        <button
-          onClick={() => setShowTranslation((prev) => !prev)}
-          className="p-2 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition"
-          title="Показать/Скрыть перевод"
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={isTranslationHidden ? 'hidden' : 'visible'}
+          className={`italic text-sm ${
+            isTranslationHidden
+              ? 'blur-sm text-transparent'
+              : 'text-muted-foreground'
+          } transition-all`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         >
-          {showTranslation ? <Eye size={20} /> : <EyeOff size={20} />}
-        </button>
+          {isEnglish ? word.translation : word.word}
+        </motion.p>
+      </AnimatePresence>
 
-        <button
-          onClick={speak}
-          className="p-2 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition"
-          title="Озвучить слово"
-        >
-          <Volume2 size={20} />
+      <motion.p
+        className="text-sm text-zinc-300 transition-all"
+        dangerouslySetInnerHTML={{
+          __html: highlight(word.example, word.word),
+        }}
+      />
+
+      <div className="flex justify-between items-center pt-2 border-t border-zinc-800 mt-4">
+        <div className="flex space-x-3">
+          <button
+            onClick={() => speak(isEnglish ? word.word : word.translation)}
+            title="Озвучить"
+          >
+            <Volume2 className="w-5 h-5 text-muted-foreground hover:text-white" />
+          </button>
+
+          <button
+            onClick={() => setIsTranslationHidden((prev) => !prev)}
+            title="Показать/скрыть перевод"
+          >
+            {isTranslationHidden ? (
+              <Eye className="w-5 h-5 text-muted-foreground hover:text-white" />
+            ) : (
+              <EyeOff className="w-5 h-5 text-muted-foreground hover:text-white" />
+            )}
+          </button>
+        </div>
+
+        <button title="Пометить как выученное">
+          <CheckCircle className="w-5 h-5 text-green-500 hover:text-green-400" />
         </button>
       </div>
     </motion.div>
