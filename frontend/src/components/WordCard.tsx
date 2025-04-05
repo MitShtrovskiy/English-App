@@ -1,71 +1,45 @@
 import { motion } from 'framer-motion'
-import { Switch } from '@/components/ui/switch'
 
-interface WordCardProps {
-  word: {
-    id: number
-    word: string
-    transcription?: string
-    translation: string
-    example: string
-    learned: boolean
-  }
-  direction: 'next' | 'prev'
+interface Word {
+  id: number
+  word: string
+  transcription: string
+  translation: string
+  example: string
+  learned: boolean
 }
 
-const variants = {
-  enter: (direction: 'next' | 'prev') => ({
-    x: direction === 'next' ? 100 : -100,
-    opacity: 0,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-    transition: { duration: 0.3 },
-  },
-  exit: (direction: 'next' | 'prev') => ({
-    x: direction === 'next' ? -100 : 100,
-    opacity: 0,
-    transition: { duration: 0.2 },
-  }),
+interface Props {
+  word: Word
 }
 
-export default function WordCard({ word, direction }: WordCardProps) {
+export default function WordCard({ word }: Props) {
   const highlightedExample = word.example.replace(
-    new RegExp(`\\b(${word.word})\\b`, 'gi'),
-    '**$1**'
+    new RegExp(`\\b${word.word}\\b`, 'gi'),
+    (match) => `<strong>${match}</strong>`
   )
 
   return (
     <motion.div
-      key={word.id}
-      className="bg-zinc-900 rounded-2xl shadow-xl p-6 space-y-4 w-full border border-zinc-800 text-white absolute"
-      custom={direction}
-      initial="enter"
-      animate="center"
-      exit="exit"
-      variants={variants}
+      className="bg-zinc-900 rounded-3xl shadow-2xl p-6 space-y-4 text-white w-full max-w-sm border border-zinc-800"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
       layout
     >
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-3xl font-bold leading-tight">{word.word}</h2>
-          {word.transcription && (
-            <p className="text-sm text-muted-foreground mt-1">
-              [{word.transcription}]
-            </p>
-          )}
-        </div>
-        <Switch checked={word.learned} disabled />
+      <div className="text-center space-y-1">
+        <h2 className="text-3xl font-bold">{word.word}</h2>
+        <p className="text-muted-foreground text-sm italic">{word.transcription}</p>
       </div>
-      <p className="text-muted-foreground italic">{word.translation}</p>
-      <p className="text-sm text-zinc-300">
-        <span
-          dangerouslySetInnerHTML={{
-            __html: highlightedExample.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
-          }}
-        />
-      </p>
+
+      <div className="bg-zinc-800 text-center rounded-xl py-2 text-lg font-medium">
+        {word.translation}
+      </div>
+
+      <div
+        className="text-sm text-zinc-300"
+        dangerouslySetInnerHTML={{ __html: highlightedExample }}
+      />
     </motion.div>
   )
 }
