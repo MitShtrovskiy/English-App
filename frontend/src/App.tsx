@@ -5,7 +5,7 @@ import WordDetail from './pages/WordDetail'
 import { Navbar } from './components/Navbar'
 import Upload from './pages/Upload'
 import WordListPage from './pages/WordListPage'
-
+import EditWordPage from './pages/EditWordPage'
 
 export default function App() {
   return (
@@ -18,6 +18,7 @@ export default function App() {
           <Route path="/upload" element={<Upload />} />
           <Route path="/list" element={<WordListPage />} />
           <Route path="/edit/:id" element={<EditWordPage />} />
+          <Route path="/words/:id/edit" element={<EditWordPage />} />
         </Routes>
         <Navbar />
       </div>

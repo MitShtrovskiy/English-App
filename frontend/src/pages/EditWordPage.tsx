@@ -1,103 +1,62 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { api } from '../utils/api'
+import { api } from '@/utils/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { ArrowLeft, Trash2 } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
 
 export default function EditWordPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const [form, setForm] = useState({
+    word: '',
+    translation: '',
+    transcription: '',
+    example: '',
+  })
 
-  const [word, setWord] = useState('')
-  const [translation, setTranslation] = useState('')
-  const [example, setExample] = useState('')
-  const [transcription, setTranscription] = useState('')
-  const [learned, setLearned] = useState(false)
+  const fetchWord = async () => {
+    const res = await api.get(`/words/${id}`)
+    setForm(res.data)
+  }
 
   useEffect(() => {
-    if (id) {
-      api.get(`/words/${id}`).then((res) => {
-        const data = res.data
-        setWord(data.word)
-        setTranslation(data.translation)
-        setExample(data.example)
-        setTranscription(data.transcription || '')
-        setLearned(data.learned)
-      })
-    }
-  }, [id])
+    fetchWord()
+  }, [])
 
-  const handleSubmit = async () => {
-    if (!word || !translation || !example) {
-      alert('Пожалуйста, заполните все поля')
-      return
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
 
-    await api.patch(`/words/${id}`, {
-      word,
-      translation,
-      example,
-      transcription,
-      learned
-    })
-
-    navigate('/word-list')
+  const handleSave = async () => {
+    if (!form.word.trim() || !form.translation.trim()) return alert('Все поля обязательны')
+    await api.put(`/words/${id}`, form)
+    navigate('/words')
   }
 
   const handleDelete = async () => {
-    if (!confirm('Точно удалить это слово?')) return
-
-    await api.delete(`/words/${id}`)
-    navigate('/word-list')
+    if (confirm('Удалить слово?')) {
+      await api.delete(`/words/${id}`)
+      navigate('/words')
+    }
   }
 
   return (
-    <div className="max-w-[430px] mx-auto px-4 py-6 space-y-6">
-      {/* Кнопка назад */}
-      <Button variant="ghost" onClick={() => navigate(-1)} className="absolute top-4 left-4">
-        <ArrowLeft className="w-5 h-5" />
+    <div className="p-4 space-y-4 max-w-lg mx-auto">
+      <Button variant="ghost" onClick={() => navigate(-1)}>
+        ← Назад
       </Button>
 
-      <h1 className="text-2xl font-bold mb-4 text-center">Редактирование слова</h1>
+      <Input placeholder="Слово" name="word" value={form.word} onChange={handleChange} required />
+      <Input placeholder="Перевод" name="translation" value={form.translation} onChange={handleChange} required />
+      <Input placeholder="Транскрипция" name="transcription" value={form.transcription} onChange={handleChange} />
+      <Textarea placeholder="Пример использования" name="example" value={form.example} onChange={handleChange} />
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label>Слово (на английском)</Label>
-          <Input value={word} onChange={(e) => setWord(e.target.value)} />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Перевод</Label>
-          <Input value={translation} onChange={(e) => setTranslation(e.target.value)} />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Транскрипция</Label>
-          <Input value={transcription} onChange={(e) => setTranscription(e.target.value)} />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Пример</Label>
-          <Input value={example} onChange={(e) => setExample(e.target.value)} />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label>Выучено</Label>
-          <Switch checked={learned} onCheckedChange={setLearned} />
-        </div>
-      </div>
-
-      <div className="flex gap-2 pt-4">
-        <Button className="flex-1" onClick={handleSubmit}>
-          Сохранить
-        </Button>
-        <Button variant="destructive" className="flex-1" onClick={handleDelete}>
-          <Trash2 className="w-4 h-4 mr-2" />
+      <div className="flex justify-between gap-2 pt-4">
+        <Button variant="destructive" onClick={handleDelete}>
           Удалить
         </Button>
+        <Button onClick={handleSave}>Сохранить</Button>
       </div>
     </div>
   )
