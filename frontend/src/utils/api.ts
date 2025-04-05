@@ -1,5 +1,6 @@
+// frontend/src/utils/api.ts
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: 'https://english-app-backend-mvbg.onrender.com', // 👈 это и есть твой backend
 })
