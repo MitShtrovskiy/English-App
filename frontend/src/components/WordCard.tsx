@@ -12,8 +12,6 @@ interface WordCardProps {
 }
 
 export default function WordCard({ word }: WordCardProps) {
-  if (!word) return null // 🛡️ Предотвращает падение рендера
-  
   return (
     <motion.div
       className="bg-zinc-900 rounded-2xl shadow-xl p-6 space-y-4 w-full border border-zinc-800"
