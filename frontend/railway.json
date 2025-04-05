@@ -1,0 +1,7 @@
+{
+  "build": "npm run build",
+  "start": "serve -s dist",
+  "static": {
+    "publicDir": "dist"
+  }
+}
