@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../utils/api'
-import WordCard from '../components/WordCard'
+import { WordCard } from '../components/WordCard'
 import TinderCard from 'react-tinder-card'
 
 export default function Home() {

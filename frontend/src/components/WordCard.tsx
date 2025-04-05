@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import { Switch } from "@/components/ui/switch"
+import { WordCard } from '../components/WordCard'
 
 interface WordCardProps {
   word: {
