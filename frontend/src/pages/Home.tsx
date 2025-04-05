@@ -38,13 +38,12 @@ export default function Home() {
               transition={{ duration: 0.3 }}
               className="w-full"
             >
-              <WordCard word={current} onRefresh={() => {
-                api.get('/words').then((res) => setWords(res.data))
-              }} />
+              <WordCard word={current} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
       <div className="flex justify-between gap-4 w-full mt-6">
         <Button onClick={prev} className="w-full text-base font-semibold">Назад</Button>
         <Button onClick={next} className="w-full text-base font-semibold">Вперёд</Button>
