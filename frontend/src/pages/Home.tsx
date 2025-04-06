@@ -39,15 +39,6 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col items-center justify-between h-[100dvh] overflow-hidden px-4 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
-      {/* 👇 Навигационная панель */}
-      <div className="flex justify-between w-full max-w-[430px] pt-4 pb-2 z-10">
-        <Button onClick={() => (window.location.href = '/word-list')} variant="ghost" size="icon">
-          📚
-        </Button>
-        <Button onClick={() => (window.location.href = '/upload')} variant="ghost" size="icon">
-          ⬆️
-        </Button>
-      </div>
 
       {/* 👇 Контент карточки */}
       <div className="flex flex-1 items-center justify-center w-full max-w-[430px] relative">
