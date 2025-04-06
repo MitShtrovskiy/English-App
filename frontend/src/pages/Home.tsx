@@ -3,79 +3,67 @@ import { getWords } from '../api'
 import { Word } from '../types'
 import WordCard from '../components/WordCard'
 import Navbar from '../components/Navbar'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import '../styles/home.css'
-
+import NavigationButtons from '../components/NavigationButtons'
 
 export default function Home() {
   const [words, setWords] = useState<Word[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [direction, setDirection] = useState<'left' | 'right'>('right')
+  const [isLoading, setIsLoading] = useState(true)
 
+  // 🧠 Получаем слова с сервера
   useEffect(() => {
-    const fetchWords = async () => {
-      const data = await getWords()
-      setWords(data)
-    }
-    fetchWords()
+    getWords()
+      .then((data) => {
+        console.log('Полученные слова:', data) // 🔍 Лог для отладки
+        setWords(data)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error('Ошибка при загрузке слов:', error)
+        setIsLoading(false)
+      })
   }, [])
 
-  const handlePrev = () => {
-    if (isAnimating) return
-    setDirection('left')
-    setIsAnimating(true)
-    setTimeout(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === 0 ? words.length - 1 : prevIndex - 1
-      )
-      setIsAnimating(false)
-    }, 300)
-  }
-
+  // ⏩ Следующая карточка
   const handleNext = () => {
-    if (isAnimating) return
-    setDirection('right')
-    setIsAnimating(true)
-    setTimeout(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === words.length - 1 ? 0 : prevIndex + 1
-      )
-      setIsAnimating(false)
-    }, 300)
+    setCurrentIndex((prev) => (prev + 1) % words.length)
   }
 
-  const currentWord = words[currentIndex]
+  // ⏪ Предыдущая карточка
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length)
+  }
+
+  // 🌀 Если идёт загрузка — показываем лоадер
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-lg">Загрузка слов...</div>
+      </div>
+    )
+  }
+
+  // ❌ Если слов нет вообще — покажем сообщение
+  if (!words.length) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-lg">Слов нет. Загрузите их через «Upload»</div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* 🔼 Навбар */}
-      <Navbar words={words} />
+    <div className="min-h-screen bg-black text-white relative overflow-hidden flex flex-col items-center pt-safe">
+      {/* 🔝 Навбар */}
+      <Navbar totalWords={words.length} learnedWords={words.filter(w => w.learned).length} />
 
-      {/* 📦 Карточка */}
-      <div
-        className={`safe-area-container px-4 flex justify-center transition-transform duration-500 ${
-          isAnimating ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''
-        }`}
-      >
-        {currentWord && <WordCard word={currentWord} />}
+      {/* 🧠 Карточка слова */}
+      <div className="flex flex-1 items-center justify-center w-full">
+        <WordCard key={words[currentIndex].id} word={words[currentIndex]} />
       </div>
 
-      {/* ⬅️➡️ Навигация */}
-      <div className="flex px-10 pb-14 pt-3 gap-2 w-full justify-center items-center">
-        <button
-          onClick={handlePrev}
-          className="h-16 flex-1 bg-white/10 rounded-2xl flex items-center justify-center text-white text-lg active:bg-white/10"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <button
-          onClick={handleNext}
-          className="h-16 flex-1 bg-white/10 rounded-2xl flex items-center justify-center text-white text-lg active:bg-white/10"
-        >
-          <ArrowRight className="w-6 h-6" />
-        </button>
-      </div>
+      {/* 🔽 Кнопки навигации */}
+      <NavigationButtons onNext={handleNext} onPrev={handlePrev} />
     </div>
   )
 }

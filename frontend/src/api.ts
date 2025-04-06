@@ -1,34 +1,55 @@
+// src/api.ts
+
 import axios from 'axios'
-import { Word } from './types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-url/api'
+// ✅ Получаем базовый адрес из .env
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-/**
- * Получить список всех слов
- */
-export const getWords = async (): Promise<Word[]> => {
-  const response = await axios.get(`${API_BASE_URL}/words`)
+// ✅ Создаём инстанс axios с базовым URL
+const api = axios.create({
+  baseURL: API_BASE_URL,
+})
+
+// ✅ Получение всех слов
+export const getWords = async () => {
+  const response = await api.get('/words')
   return response.data
 }
 
-/**
- * Добавить новое слово
- */
-export const addWord = async (word: Word): Promise<Word> => {
-  const response = await axios.post(`${API_BASE_URL}/words`, word)
+// ✅ Получение одного слова по ID
+export const getWord = async (id: number) => {
+  const response = await api.get(`/words/${id}`)
   return response.data
 }
 
-/**
- * Пометить слово как выученное
- */
-export const markAsLearned = async (id: number): Promise<void> => {
-  await axios.post(`${API_BASE_URL}/words/${id}/learned`)
+// ✅ Добавление нового слова
+export const addWord = async (wordData: {
+  word: string
+  translation: string
+  transcription?: string
+  example?: string
+}) => {
+  const response = await api.post('/words', wordData)
+  return response.data
 }
 
-/**
- * Удалить слово
- */
-export const deleteWord = async (id: number): Promise<void> => {
-  await axios.delete(`${API_BASE_URL}/words/${id}`)
+// ✅ Обновление существующего слова
+export const updateWord = async (
+  id: number,
+  updatedData: {
+    word?: string
+    translation?: string
+    transcription?: string
+    example?: string
+    isLearned?: boolean
+  }
+) => {
+  const response = await api.put(`/words/${id}`, updatedData)
+  return response.data
+}
+
+// ✅ Удаление слова
+export const deleteWord = async (id: number) => {
+  const response = await api.delete(`/words/${id}`)
+  return response.data
 }
