@@ -1,43 +1,42 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Volume2, EyeOff, RefreshCcw, Check } from 'lucide-react'
+import { Volume2, EyeOff, RefreshCcw, Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import { speak } from '../utils/speak'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/utils/cn'
 
-interface Word {
-  id: number
-  word: string
-  translation: string
-  example: string
-  transcription?: string
-  learned: boolean
+interface WordCardProps {
+  word: {
+    id: number
+    word: string
+    translation: string
+    transcription?: string
+    example: string
+    learned: boolean
+  }
+  onNext: () => void
+  onPrev: () => void
 }
 
-interface Props {
-  word: Word
-  onMarkAsLearned?: () => void
-}
-
-const gradients = [
-  'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
-  'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
-  'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
-  'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
-  'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)'
-]
-
-export default function WordCard({ word, onMarkAsLearned }: Props) {
+export default function WordCard({ word, onNext, onPrev }: WordCardProps) {
   const [isTranslationHidden, setIsTranslationHidden] = useState(true)
   const [isEnglishFirst, setIsEnglishFirst] = useState(true)
 
-  // 🌈 Случайный градиент — фиксированный на ререндер
-  const background = useMemo(() => {
-    const index = word.id % gradients.length
-    return gradients[index]
-  }, [word.id])
+  const showTranslation = !isTranslationHidden
+  const isEnglish = isEnglishFirst
+  const displayedWord = isEnglish ? word.word : word.translation
+  const translation = isEnglish ? word.translation : word.word
 
-  const textToDisplay = isEnglishFirst ? word.word : word.translation
-  const translation = isEnglishFirst ? word.translation : word.word
+  const gradient = useMemo(() => {
+    const gradients = [
+      'from-pink-500 via-red-500 to-yellow-500',
+      'from-blue-500 via-purple-500 to-pink-500',
+      'from-green-400 via-blue-500 to-purple-600',
+      'from-yellow-400 via-red-500 to-pink-500',
+      'from-indigo-400 via-purple-400 to-pink-400',
+    ]
+    return gradients[Math.floor(Math.random() * gradients.length)]
+  }, [])
 
   const highlightWordInExample = () => {
     const regex = new RegExp(`\\b${word.word}\\b`, 'gi')
@@ -51,11 +50,11 @@ export default function WordCard({ word, onMarkAsLearned }: Props) {
             {part}
             {matches && matches[i] && (
               <span className="relative font-medium">
-                {isEnglishFirst || !isTranslationHidden ? (
+                {isEnglish || showTranslation ? (
                   <span className="text-white font-bold">{matches[i]}</span>
                 ) : (
-                  <span className="relative">
-                    <span className="text-white font-bold">{matches[i]}</span>
+                  <span className="relative text-white font-bold">
+                    {matches[i]}
                     <span className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm rounded-sm" />
                   </span>
                 )}
@@ -69,61 +68,78 @@ export default function WordCard({ word, onMarkAsLearned }: Props) {
 
   return (
     <motion.div
-      className="flex flex-col justify-between h-full w-full rounded-2xl p-6 text-white"
-      style={{
-        background,
-        WebkitBackdropFilter: 'blur(10px)',
-        backdropFilter: 'blur(10px)'
-      }}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
+      exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
+      layout
+      className={cn(
+        'relative rounded-[32px] w-full h-full flex flex-col justify-between p-6 text-white',
+        'bg-gradient-to-br', gradient,
+        'backdrop-blur-lg shadow-2xl'
+      )}
     >
-      {/* 📱 Учёт safe-area-top */}
-      <div className="pt-[env(safe-area-inset-top)]">
-        <div className="space-y-1 text-left">
-          <h2 className="text-2xl font-bold">{textToDisplay}</h2>
-          {word.transcription && isEnglishFirst && (
-            <p className="text-sm text-white/70">{word.transcription}</p>
-          )}
-        </div>
-
-        <p
-          className={`italic text-sm mt-3 relative inline-block transition duration-300 ${
-            isTranslationHidden ? 'blur-sm select-none' : ''
-          }`}
-        >
-          {translation}
-        </p>
-
-        <p className="mt-6 text-sm leading-relaxed">{highlightWordInExample()}</p>
+      {/* Слово и транскрипция */}
+      <div className="space-y-1">
+        <h2 className="text-3xl font-bold leading-snug">{displayedWord}</h2>
+        {isEnglish && word.transcription && (
+          <p className="text-sm text-white/70">{word.transcription}</p>
+        )}
       </div>
 
-      {/* 📱 Safe-area-bottom + Контролы */}
-      <div className="pt-6 pb-[env(safe-area-inset-bottom)] mt-auto">
-        <div className="flex justify-between items-center gap-2 flex-wrap">
+      {/* Перевод */}
+      <p
+        className={cn(
+          'italic text-white/90 text-base transition duration-300 mt-4',
+          isTranslationHidden ? 'blur-sm select-none' : ''
+        )}
+      >
+        {translation}
+      </p>
+
+      {/* Пример */}
+      <p className="text-sm text-white/90 mt-4 leading-relaxed">
+        {highlightWordInExample()}
+      </p>
+
+      {/* Контролы */}
+      <div className="mt-auto pt-6">
+        <div className="flex justify-between gap-2">
+          {/* Язык / Перевод / Озвучка */}
           <div className="flex gap-2">
-            {/* 👁️ Hide Translation */}
             <Button variant="ghost" onClick={() => setIsTranslationHidden(!isTranslationHidden)} size="icon">
               <EyeOff className="w-5 h-5" />
             </Button>
-
-            {/* 🔊 Sound */}
             <Button variant="ghost" onClick={() => speak(word.word)} size="icon">
               <Volume2 className="w-5 h-5" />
             </Button>
-
-            {/* 🔁 Change Language */}
             <Button variant="ghost" onClick={() => setIsEnglishFirst(!isEnglishFirst)} size="icon">
               <RefreshCcw className="w-5 h-5" />
             </Button>
           </div>
 
-          {/* ✅ Mark as Learned */}
-          <Button onClick={onMarkAsLearned} variant="outline" className="ml-auto text-sm">
+          {/* Кнопка "Выучил" */}
+          <Button variant="outline" className="text-sm">
             <Check className="w-4 h-4 mr-2" />
             Выучил
+          </Button>
+        </div>
+
+        {/* Навигация */}
+        <div className="flex gap-4 mt-6">
+          <Button
+            onClick={onPrev}
+            className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10 text-white text-sm"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Назад
+          </Button>
+          <Button
+            onClick={onNext}
+            className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10 text-white text-sm"
+          >
+            <ChevronRight className="w-5 h-5" />
+            Вперёд
           </Button>
         </div>
       </div>
