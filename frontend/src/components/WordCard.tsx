@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
 import { Volume2, EyeOff, RefreshCcw, Check } from 'lucide-react'
 import { speak } from '../utils/speak'
-import { generateGradient } from '@/utils/gradients'
+import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
 
 interface WordCardProps {
   word: {
@@ -14,18 +13,31 @@ interface WordCardProps {
     example: string
     learned: boolean
   }
-  onRefresh?: () => void
+  isEnglishFirst: boolean
+  isTranslationHidden: boolean
+  onToggleLanguage: () => void
+  onToggleTranslation: () => void
+  onMarkAsLearned: () => void
 }
 
-export default function WordCard({ word, onRefresh }: WordCardProps) {
-  const [isTranslationHidden, setIsTranslationHidden] = useState(true)
-  const [isEnglishFirst, setIsEnglishFirst] = useState(true)
-
-  const displayWord = isEnglishFirst ? word.word : word.translation
+export default function WordCard({
+  word,
+  isEnglishFirst,
+  isTranslationHidden,
+  onToggleLanguage,
+  onToggleTranslation,
+  onMarkAsLearned,
+}: WordCardProps) {
+  const displayedWord = isEnglishFirst ? word.word : word.translation
   const translation = isEnglishFirst ? word.translation : word.word
-  const gradient = generateGradient(word.id)
 
-  const highlightExample = () => {
+  // 🎙️ Озвучка
+  const handleSpeak = () => {
+    speak(word.word)
+  }
+
+  // ✨ Пример с выделением слова и светлой плашкой блюра
+  const renderExample = () => {
     const regex = new RegExp(`\\b${word.word}\\b`, 'gi')
     const parts = word.example.split(regex)
     const matches = word.example.match(regex)
@@ -50,47 +62,51 @@ export default function WordCard({ word, onRefresh }: WordCardProps) {
   }
 
   return (
-    <div
-      className="rounded-3xl p-6 flex flex-col justify-between w-full h-full max-h-[calc(100dvh-200px)] overflow-hidden"
-      style={{
-        background: gradient,
-        backdropFilter: 'blur(20px)',
-      }}
+    <motion.div
+      className="rounded-3xl p-6 w-full h-full flex flex-col justify-between overflow-hidden text-left relative"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.4 }}
     >
-      {/* 🌐 Основное слово и транскрипция */}
       <div className="space-y-2">
-        <h2 className="text-3xl font-bold text-white">{displayWord}</h2>
+        {/* 🧠 Слово и транскрипция */}
+        <h2 className="text-4xl font-bold text-white">{displayedWord}</h2>
         {word.transcription && isEnglishFirst && (
-          <p className="text-sm text-muted-foreground">{word.transcription}</p>
+          <p className="text-white text-base">{word.transcription}</p> // транскрипция теперь белая
         )}
+
+        {/* 🫣 Перевод с возможностью скрытия */}
         <p
-          className={`italic text-muted-foreground text-sm transition duration-300 ${
+          className={`text-base italic relative transition duration-300 inline-block ${
             isTranslationHidden ? 'blur-sm select-none' : ''
           }`}
         >
           {translation}
         </p>
-        <p className="text-sm text-zinc-100 mt-4">{highlightExample()}</p>
+
+        {/* 📝 Пример */}
+        <p className="mt-4 text-zinc-100 text-base leading-relaxed">{renderExample()}</p>
       </div>
 
-      {/* 🎛 Контролы */}
-      <div className="flex justify-between items-center mt-6 gap-2 flex-wrap">
-        <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setIsTranslationHidden(!isTranslationHidden)}>
-            <EyeOff className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => speak(word.word)}>
-            <Volume2 className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setIsEnglishFirst(!isEnglishFirst)}>
-            <RefreshCcw className="w-5 h-5" />
-          </Button>
-        </div>
-        <Button variant="outline" size="sm">
+      {/* 🧩 Контролы */}
+      <div className="flex items-center gap-3 flex-wrap pt-6">
+        <Button onClick={onToggleTranslation} variant="ghost" size="lg" className="w-12 h-12">
+          <EyeOff className="w-6 h-6" />
+        </Button>
+        <Button onClick={handleSpeak} variant="ghost" size="lg" className="w-12 h-12">
+          <Volume2 className="w-6 h-6" />
+        </Button>
+        <Button onClick={onToggleLanguage} variant="ghost" size="lg" className="w-12 h-12">
+          <RefreshCcw className="w-6 h-6" />
+        </Button>
+
+        {/* ✅ Выучено */}
+        <Button onClick={onMarkAsLearned} variant="outline" className="ml-auto text-sm px-4 py-3 rounded-xl">
           <Check className="w-4 h-4 mr-2" />
           Выучил
         </Button>
       </div>
-    </div>
+    </motion.div>
   )
 }
