@@ -1,116 +1,128 @@
-// src/components/WordCard.tsx
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Volume2, EyeOff, RefreshCcw, Check } from 'lucide-react'
+import { speak } from '@/utils/speak'
+import { Button } from '@/components/ui/button'
 
-import { useEffect, useState } from 'react'
-import { Word } from '../types'
-import { volume, eye, eyeOff, shuffle, check } from 'lucide-react'
-import { playSound } from '../utils/playSound'
-import { cn } from '../utils/cn'
+interface WordCardProps {
+  word: {
+    id: number
+    word: string
+    translation: string
+    example: string
+    transcription?: string
+    learned: boolean
+  }
+  onRefresh?: () => void
+}
 
-export default function WordCard({
-  word,
-  isEnglishFirst,
-  isTranslationHidden,
-  onToggleLanguage,
-  onToggleTranslation,
-  onMarkLearned,
-}: {
-  word: Word
-  isEnglishFirst: boolean
-  isTranslationHidden: boolean
-  onToggleLanguage: () => void
-  onToggleTranslation: () => void
-  onMarkLearned: () => void
-}) {
-  const [gradient, setGradient] = useState<string>('')
+export default function WordCard({ word, onRefresh }: WordCardProps) {
+  const [isTranslationHidden, setIsTranslationHidden] = useState(true)
+  const [isEnglishFirst, setIsEnglishFirst] = useState(true)
 
-  // 🌈 Случайный градиент
-  useEffect(() => {
-    const gradients = [
-      'linear-gradient(180deg, #FF7E5F, #FEB47B)',
-      'linear-gradient(180deg, #6A82FB, #FC5C7D)',
-      'linear-gradient(180deg, #43CEA2, #185A9D)',
-      // ...добавь ещё 40
-    ]
-    setGradient(gradients[Math.floor(Math.random() * gradients.length)])
-  }, [word.id])
+  const textToDisplay = isEnglishFirst ? word.word : word.translation
+  const translation = isEnglishFirst ? word.translation : word.word
 
-  const mainWord = isEnglishFirst ? word.english : word.russian
-  const translation = isEnglishFirst ? word.russian : word.english
+  const handleSpeak = () => speak(word.word)
+
+  const renderExample = () => {
+    const regex = new RegExp(`\\b${word.word}\\b`, 'gi')
+    const parts = word.example.split(regex)
+    const matches = word.example.match(regex)
+
+    return parts.map((part, i) => (
+      <span key={i}>
+        {part}
+        {matches && matches[i] && (
+          <span className="relative font-bold text-white">
+            {isEnglishFirst || !isTranslationHidden ? (
+              matches[i]
+            ) : (
+              <>
+                <span className="relative z-10">{matches[i]}</span>
+                <span className="absolute inset-0 bg-white/10 backdrop-blur-[4px] border border-white/5 rounded-md z-20" />
+              </>
+            )}
+          </span>
+        )}
+      </span>
+    ))
+  }
+
+  // 🎨 Градиенты
+  const gradients = [
+    'from-pink-500 to-yellow-500',
+    'from-indigo-500 to-purple-600',
+    'from-green-400 to-blue-500',
+    'from-orange-400 to-red-500',
+    'from-cyan-400 to-blue-600',
+    'from-teal-400 to-lime-500',
+    'from-rose-400 to-pink-500',
+    'from-fuchsia-500 to-violet-600',
+    'from-sky-400 to-blue-700',
+  ]
+  const gradient = gradients[word.id % gradients.length]
 
   return (
-    <div
-      className="w-[440px] h-[956px] pt-[54px] flex flex-col items-start shrink-0"
-      style={{ background: gradient, borderRadius: 32 }}
+    <motion.div
+      initial={{ x: 100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -100, opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className={`flex flex-col items-start flex-1 w-full h-full rounded-[32px] p-6 bg-gradient-to-br ${gradient} text-white`}
     >
-      {/* 🔠 Слово и транскрипция */}
-      <div className="flex px-5 pt-6 pb-5 gap-5 self-stretch">
-        <div className="text-white text-[32px] font-light leading-[22px] text-center font-['SF Pro']">
-          {mainWord}
-        </div>
-        <div className="text-white/80 text-[16px] leading-[22px] text-center font-['SF Pro Text']">
-          {word.transcription}
-        </div>
+      {/* 🔤 Слово и транскрипция */}
+      <div className="flex flex-col gap-2 p-6 w-full">
+        <h2 className="text-[32px] font-light leading-[22px]">{textToDisplay}</h2>
+        {isEnglishFirst && word.transcription && (
+          <p className="text-[16px] font-light text-white/80 leading-[22px]">{word.transcription}</p>
+        )}
       </div>
 
       {/* 🌐 Перевод */}
-      <div className="flex px-5 flex-col items-start gap-5 flex-1 self-stretch">
-        <div className="relative text-white text-[24px] font-medium leading-[22px] font-['SF Pro']">
-          {isTranslationHidden ? (
-            <div className="px-2 py-1 rounded-[12px] border border-white/5 bg-[#D9D9D914] backdrop-blur-[32px]">
-              {translation}
-            </div>
-          ) : (
-            translation
-          )}
-        </div>
+      <div className="flex flex-col gap-5 px-5 flex-1 w-full">
+        <p
+          className={`text-[24px] font-medium leading-[22px] relative px-2 py-[6px] rounded-xl border border-white/5 bg-white/10 backdrop-blur-[32px] ${
+            isTranslationHidden ? 'blur-sm select-none' : ''
+          }`}
+        >
+          {translation}
+        </p>
 
-        {/* 📖 Пример */}
-        <div className="text-white/60 text-[20px] font-light leading-[30px] font-['SF Pro']">
-          {word.example.replace(mainWord, (match) =>
-            isTranslationHidden
-              ? `<span class="font-bold relative z-10">${match}</span><span class="absolute inset-0 bg-[#D9D9D914] backdrop-blur-sm rounded-[8px] z-20"></span>`
-              : `<span class="font-bold">${match}</span>`
-          )}
-        </div>
+        {/* 📘 Пример */}
+        <p className="text-[20px] font-light text-white/70 leading-[30px]">{renderExample()}</p>
       </div>
 
-      {/* 🎛 Контролы */}
-      <div className="flex p-5 justify-center items-center gap-[6px] self-stretch">
-        <div className="flex p-1 items-center gap-1 rounded-[24px] bg-white/10">
-          {/* Озвучка */}
-          <button
-            className="w-[64px] h-[64px] flex justify-center items-center rounded-[20px] bg-white/10"
-            onClick={() => playSound(word.english)}
+      {/* 🎛 Контролы + кнопка выучил */}
+      <div className="flex justify-center items-center p-5 gap-2 w-full">
+        <div className="flex items-center gap-1 bg-white/10 p-1 rounded-[24px]">
+          <Button
+            onClick={() => setIsTranslationHidden(!isTranslationHidden)}
+            className="w-16 h-16 rounded-[20px] bg-white/10"
+            size="icon"
           >
-            <volume />
-          </button>
-
-          {/* Переключение языка */}
-          <button
-            className="w-[64px] h-[64px] flex justify-center items-center rounded-[20px] bg-white/10"
-            onClick={onToggleLanguage}
+            <EyeOff />
+          </Button>
+          <Button
+            onClick={handleSpeak}
+            className="w-16 h-16 rounded-[20px] bg-white/10"
+            size="icon"
           >
-            <shuffle />
-          </button>
-
-          {/* Скрытие перевода */}
-          <button
-            className="w-[64px] h-[64px] flex justify-center items-center rounded-[20px] bg-white/10"
-            onClick={onToggleTranslation}
+            <Volume2 />
+          </Button>
+          <Button
+            onClick={() => setIsEnglishFirst(!isEnglishFirst)}
+            className="w-16 h-16 rounded-[20px] bg-white/10"
+            size="icon"
           >
-            {isTranslationHidden ? <eyeOff /> : <eye />}
-          </button>
-
-          {/* ✅ Выучено */}
-          <button
-            className="flex h-[64px] px-5 justify-center items-center gap-2 rounded-[20px] bg-white/10 text-white"
-            onClick={onMarkLearned}
-          >
-            <check size={24} />
-            <span className="text-base">Выучил</span>
-          </button>
+            <RefreshCcw />
+          </Button>
+          <Button className="h-16 px-6 rounded-[20px] bg-white/10 text-white text-base font-medium flex gap-2">
+            <Check className="w-5 h-5" />
+            Выучил
+          </Button>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

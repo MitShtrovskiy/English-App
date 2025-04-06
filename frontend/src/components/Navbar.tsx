@@ -1,119 +1,31 @@
 import { useNavigate } from 'react-router-dom'
-import { List, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ReactComponent as ListIcon } from '@/assets/icons/list.svg'
+import { ReactComponent as DownloadIcon } from '@/assets/icons/download.svg'
 
 export default function Navbar() {
   const navigate = useNavigate()
 
   return (
-    <div
-      className="
-        flex
-        items-start
-        justify-between
-        gap-5
-        px-5
-        pt-[20px]
-        pb-0
-        w-full
-        max-w-[440px]
-        mx-auto
-        z-50
-        relative
-      "
-      style={{
-        background: 'transparent', // ⛔️ Без фона, как в макете
-      }}
-    >
-      {/* 🔙 Кнопка "Список слов" */}
-      <button
+    <div className="flex p-5 gap-5 w-full max-w-[440px] mx-auto">
+      <Button
+        className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10"
         onClick={() => navigate('/list')}
-        className="
-          flex
-          w-[64px]
-          h-[64px]
-          flex-col
-          justify-center
-          items-center
-          gap-2.5
-          rounded-[20px]
-          bg-[rgba(255,255,255,0.12)]
-        "
       >
-        {/* ✅ Иконка списка слов */}
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-          <path
-            d="M5.3635 20.4855L2.6371 7.65874..."
-            fill="white"
-            fillOpacity="0.6"
-          />
-        </svg>
-      </button>
+        <ListIcon />
+      </Button>
 
-      {/* 📖 Заголовок и прогресс */}
-      <div
-        className="
-          flex
-          pt-[2px]
-          flex-col
-          justify-center
-          items-start
-          gap-[4px]
-          flex-1
-          self-stretch
-        "
-      >
-        <div
-          className="
-            text-white
-            text-[24px]
-            font-[274]
-            leading-[22px]
-            font-['SF Pro']
-          "
-        >
-          Изучение слов
-        </div>
-        <div
-          className="
-            text-[14px]
-            text-white/80
-            font-[200]
-            leading-[22px]
-            font-['SF Pro Text']
-          "
-        >
-          {/* 🧠 Счётчик будет динамическим (выучено/всего) */}
-          {/* Пример: выучено 3/40 */}
-          {/* Подставляется через пропсы, можно сделать позже */}
-          выучено 3/40
-        </div>
+      <div className="flex flex-col justify-center flex-1 gap-1">
+        <h1 className="text-[24px] font-light text-white leading-[22px]">Изучение слов</h1>
+        <p className="text-sm text-white/80 font-extralight leading-[22px]">Выучено 2/40</p>
       </div>
 
-      {/* ⬇️ Кнопка загрузки слова */}
-      <button
-        onClick={() => navigate('/upload')}
-        className="
-          flex
-          w-[64px]
-          h-[64px]
-          flex-col
-          justify-center
-          items-center
-          gap-2.5
-          rounded-[20px]
-          bg-[rgba(255,255,255,0.12)]
-        "
+      <Button
+        className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10"
+        onClick={() => alert('Загрузка нового слова')}
       >
-        {/* ✅ Иконка загрузки */}
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-          <path
-            d="M5.30865 12.3467V4.4662..."
-            fill="white"
-            fillOpacity="0.6"
-          />
-        </svg>
-      </button>
+        <DownloadIcon />
+      </Button>
     </div>
   )
 }
