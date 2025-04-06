@@ -1,60 +1,76 @@
 import { useEffect, useState } from 'react'
-import WordCard from '../components/WordCard'
 import { api } from '../utils/api'
-import Navbar from '../components/Navbar'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import WordCard from '../components/WordCard'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
-  const [index, setIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  const fetchWords = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get('/words')
+      setWords(res.data)
+    } catch (e) {
+      console.error('Ошибка загрузки слов', e)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    api.get('/words').then((res) => {
-      const notLearnedWords = res.data.filter((word: any) => !word.learned)
-      setWords(notLearnedWords)
-      setIndex(0)
-    })
+    fetchWords()
   }, [])
 
-  const showPrevWord = () => {
-    setIndex((prev) => (prev - 1 + words.length) % words.length)
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % words.length)
   }
 
-  const showNextWord = () => {
-    setIndex((prev) => (prev + 1) % words.length)
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length)
   }
 
-  if (words.length === 0) {
+  if (loading) {
     return (
-      <>
-        <Navbar />
-        <div className="pt-16 flex items-center justify-center h-screen text-white">
-          Нет слов
-        </div>
-      </>
+      <div className="flex items-center justify-center h-screen text-white">
+        Загрузка слов...
+      </div>
     )
   }
 
-  return (
-    <>
-      <Navbar />
-      <main className="flex flex-col h-[100dvh] max-w-[430px] mx-auto px-4 pt-16 pb-6 overflow-hidden">
-        <div className="flex-1 flex items-center">
-          <WordCard word={words[index]} />
-        </div>
+  const currentWord = words[currentIndex]
 
-        <div className="flex gap-4 mt-6">
-          <Button onClick={showPrevWord} className="flex flex-col justify-center items-center gap-2 h-16 flex-1 rounded-2xl bg-white/10">
-            <ChevronLeft />
-            Назад
-          </Button>
-          <Button onClick={showNextWord} className="flex flex-col justify-center items-center gap-2 h-16 flex-1 rounded-2xl bg-white/10">
-            <ChevronRight />
-            Вперёд
-          </Button>
-        </div>
-      </main>
-    </>
+  return (
+    <div className="relative flex flex-col items-center justify-between px-4 pt-6 pb-28 max-w-[430px] mx-auto min-h-[100svh]">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentWord?.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="w-full h-full"
+        >
+          <WordCard word={currentWord} />
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="flex gap-4 mt-6 w-full px-2">
+        <button
+          onClick={handlePrev}
+          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 bg-white/10 rounded-2xl text-white"
+        >
+          Назад
+        </button>
+        <button
+          onClick={handleNext}
+          className="flex flex-col justify-center items-center gap-2 flex-1 h-16 bg-white/10 rounded-2xl text-white"
+        >
+          Вперед
+        </button>
+      </div>
+    </div>
   )
 }
