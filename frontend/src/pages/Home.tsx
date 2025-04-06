@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import '../styles/home.css'
 
+
 export default function Home() {
   const [words, setWords] = useState<Word[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
