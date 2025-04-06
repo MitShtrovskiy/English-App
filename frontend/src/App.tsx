@@ -17,7 +17,7 @@ export default function App() {
           <Route path="/dictionary" element={<Dictionary />} />
           <Route path="/dictionary/:id" element={<WordDetail />} />
           <Route path="/upload" element={<Upload />} />
-          <Route path="/list" element={<WordListPage />} />
+          <Route path="/list" element={<WordListPage />} /> {/* ✅ путь */}
           <Route path="/edit/:id" element={<EditWordPage />} />
           <Route path="/words/:id/edit" element={<EditWordPage />} />
           <Route path="/words" element={<WordListPage />} />
