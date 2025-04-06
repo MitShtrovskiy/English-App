@@ -1,69 +1,54 @@
-// Импорты
+// Home.tsx
+
 import { useEffect, useState } from 'react'
-import WordCard from '../components/WordCard'
 import { api } from '../utils/api'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import WordCard from '../components/WordCard'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  // Загрузка слов с бэка
-  const fetchWords = async () => {
-    try {
-      const res = await api.get('/words')
-      setWords(res.data.filter((word: any) => !word.learned))
-      setCurrentIndex(0)
-    } catch (err) {
-      console.error(err)
-    }
-  }
+  const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    fetchWords()
+    api.get('/words').then((res) => {
+      const filtered = res.data.filter((w: any) => !w.learned)
+      setWords(filtered)
+      setIndex(0)
+    })
   }, [])
 
-  // Навигация между словами
-  const nextCard = () => {
-    setCurrentIndex((prev) => (prev + 1) % words.length)
-  }
+  const nextCard = () => setIndex((prev) => (prev + 1) % words.length)
+  const prevCard = () => setIndex((prev) => (prev - 1 + words.length) % words.length)
 
-  const prevCard = () => {
-    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length)
-  }
-
-  const currentWord = words[currentIndex]
+  const currentWord = words[index]
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-between p-4 pb-6 max-w-[430px] mx-auto overflow-hidden">
-      {/* Карточка слова */}
-      <div className="flex-1 w-full transition-all duration-500">
-        {currentWord ? (
-          <WordCard word={currentWord} onRefresh={fetchWords} />
-        ) : (
-          <div className="text-center text-zinc-400 mt-20">
-            Все слова выучены 🎉
-          </div>
+    <div
+      className="flex w-[440px] h-[956px] pt-[54px] flex-col items-start flex-shrink-0 mx-auto overflow-hidden"
+      // Контейнер карточки: размеры и padding сверху, как в макете
+    >
+      <div className="flex flex-col items-start flex-1 w-full">
+        {currentWord && (
+          <WordCard word={currentWord} key={currentWord.id} />
         )}
       </div>
 
-      {/* Кнопки навигации */}
-      <div className="flex gap-4 mt-6 w-full">
-        <Button
+      {/* 🔽 Кнопки Вперёд / Назад — вне карточки */}
+      <div className="flex justify-between gap-4 px-4 w-full mt-4 mb-4">
+        <button
+          className="flex h-[64px] flex-col justify-center items-center gap-[10px] flex-1 rounded-[20px] bg-white/10 text-white text-lg active:bg-transparent"
           onClick={prevCard}
-          className="flex flex-col justify-center items-center h-16 flex-1 rounded-[20px] bg-white/10 text-white active:bg-white/10"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ArrowLeft className="w-5 h-5" />
           Назад
-        </Button>
-        <Button
+        </button>
+        <button
+          className="flex h-[64px] flex-col justify-center items-center gap-[10px] flex-1 rounded-[20px] bg-white/10 text-white text-lg active:bg-transparent"
           onClick={nextCard}
-          className="flex flex-col justify-center items-center h-16 flex-1 rounded-[20px] bg-white/10 text-white active:bg-white/10"
         >
-          <ChevronRight className="w-6 h-6" />
+          <ArrowRight className="w-5 h-5" />
           Вперёд
-        </Button>
+        </button>
       </div>
     </div>
   )
