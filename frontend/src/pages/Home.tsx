@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { api } from '../utils/api'
 import WordCard from '../components/WordCard'
+import { api } from '../utils/api'
+import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import Navbar from '../components/Navbar'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
@@ -17,20 +17,20 @@ export default function Home() {
     })
   }, [])
 
-  const handleNext = () => {
-    setIndex((prev) => (prev + 1) % words.length)
-  }
-
-  const handlePrev = () => {
+  const showPrevWord = () => {
     setIndex((prev) => (prev - 1 + words.length) % words.length)
   }
 
-  if (!words.length) {
+  const showNextWord = () => {
+    setIndex((prev) => (prev + 1) % words.length)
+  }
+
+  if (words.length === 0) {
     return (
       <>
         <Navbar />
         <div className="pt-16 flex items-center justify-center h-screen text-white">
-          Нет слов для изучения
+          Нет слов
         </div>
       </>
     )
@@ -39,27 +39,22 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <div className="pt-16 h-[calc(100vh-64px)] flex flex-col justify-between max-w-[430px] mx-auto px-4">
-        <div className="flex-1 flex items-center justify-center">
+      <main className="flex flex-col h-[100dvh] max-w-[430px] mx-auto px-4 pt-16 pb-6 overflow-hidden">
+        <div className="flex-1 flex items-center">
           <WordCard word={words[index]} />
         </div>
-        <div className="flex gap-4 pb-6">
-          <Button
-            onClick={handlePrev}
-            className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10 text-white text-base"
-          >
-            <ChevronLeft className="w-5 h-5" />
+
+        <div className="flex gap-4 mt-6">
+          <Button onClick={showPrevWord} className="flex flex-col justify-center items-center gap-2 h-16 flex-1 rounded-2xl bg-white/10">
+            <ChevronLeft />
             Назад
           </Button>
-          <Button
-            onClick={handleNext}
-            className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10 text-white text-base"
-          >
-            <ChevronRight className="w-5 h-5" />
+          <Button onClick={showNextWord} className="flex flex-col justify-center items-center gap-2 h-16 flex-1 rounded-2xl bg-white/10">
+            <ChevronRight />
             Вперёд
           </Button>
         </div>
-      </div>
+      </main>
     </>
   )
 }
