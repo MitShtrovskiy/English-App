@@ -1,4 +1,3 @@
-// src/components/Navbar.tsx
 import { useNavigate } from 'react-router-dom'
 import { List, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
