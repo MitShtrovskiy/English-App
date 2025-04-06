@@ -1,63 +1,74 @@
 import { useEffect, useState } from 'react'
-import { api } from '../utils/api'
 import WordCard from '../components/WordCard'
-import Navbar from '../components/Navbar'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { api } from '../utils/api'
+import { AnimatePresence } from 'framer-motion'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
-  const [index, setIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [direction, setDirection] = useState<'next' | 'prev'>('next')
 
   const fetchWords = async () => {
     const res = await api.get('/words')
     setWords(res.data)
   }
 
-  const handleNext = () => {
-    if (words.length === 0) return
-    setIndex((prev) => (prev + 1) % words.length)
-  }
-
-  const handlePrev = () => {
-    if (words.length === 0) return
-    setIndex((prev) => (prev - 1 + words.length) % words.length)
-  }
-
   useEffect(() => {
     fetchWords()
   }, [])
 
-  const currentWord = words[index]
+  const filteredWords = words.filter((w) => !w.learned)
+
+  const handleNext = () => {
+    setDirection('next')
+    setCurrentIndex((prev) => (prev + 1) % filteredWords.length)
+  }
+
+  const handlePrev = () => {
+    setDirection('prev')
+    setCurrentIndex((prev) =>
+      (prev - 1 + filteredWords.length) % filteredWords.length
+    )
+  }
+
+  const handleLearned = async () => {
+    const currentWord = filteredWords[currentIndex]
+    if (currentWord) {
+      await api.patch(`/words/${currentWord.id}`, { learned: true })
+      fetchWords()
+    }
+  }
+
+  const currentWord = filteredWords[currentIndex]
 
   return (
     <div className="relative flex flex-col items-center w-full max-w-[440px] mx-auto h-[100dvh] bg-black overflow-hidden">
-      <Navbar
-        totalCount={words.length}
-        learnedCount={words.filter((w) => w.learned).length}
-      />
-
-      <div className="flex flex-col w-full h-full pt-[54px] px-0">
-        <div className="flex-1 flex justify-center items-center">
+      <div className="flex-1 w-full">
+        <AnimatePresence mode="wait">
           {currentWord && (
-            <WordCard word={currentWord} onRefresh={fetchWords} />
+            <WordCard
+              key={currentWord.id}
+              word={currentWord}
+              onMarkAsLearned={handleLearned}
+            />
           )}
-        </div>
+        </AnimatePresence>
+      </div>
 
-        <div className="flex justify-center items-center gap-2 px-10 pb-14">
-          <Button
-            onClick={handlePrev}
-            className="flex flex-col justify-center items-center h-[64px] flex-1 rounded-[20px] bg-white/10"
-          >
-            <ChevronLeft />
-          </Button>
-          <Button
-            onClick={handleNext}
-            className="flex flex-col justify-center items-center h-[64px] flex-1 rounded-[20px] bg-white/10"
-          >
-            <ChevronRight />
-          </Button>
-        </div>
+      {/* Кнопки вперёд/назад */}
+      <div className="flex items-center justify-between gap-2 w-full px-10 pb-14 pt-4">
+        <button
+          onClick={handlePrev}
+          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10 text-white text-base"
+        >
+          Назад
+        </button>
+        <button
+          onClick={handleNext}
+          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10 text-white text-base"
+        >
+          Вперёд
+        </button>
       </div>
     </div>
   )
