@@ -28,6 +28,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
 
   const playAudio = () => speak(word.word)
 
+  // 🔍 Пример с выделением и блюром
   const renderExample = () => {
     const regex = new RegExp(`\\b${word.word}\\b`, 'gi')
     const parts = word.example.split(regex)
@@ -67,7 +68,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       className="flex flex-col items-start flex-1 w-full h-full rounded-[32px] overflow-hidden"
       style={{ background: gradient }}
     >
-      {/* 🔠 Блок слова + транскрипция (64px высота) */}
+      {/* 🔠 Блок слова и транскрипции */}
       <div className="flex flex-col px-5 pt-6 pb-5 gap-2 w-full" style={{ height: '64px' }}>
         <h2 className="text-white text-[32px] font-light leading-[22px]">{mainText}</h2>
         {word.transcription && isEnglishFirst && (
@@ -75,9 +76,9 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
         )}
       </div>
 
-      {/* 📘 Перевод + пример */}
+      {/* 📘 Перевод и пример */}
       <div className="flex flex-col gap-5 px-5 flex-1 w-full">
-        {/* 🔄 Перевод */}
+        {/* Перевод */}
         <div className="relative inline-block">
           <p
             className={cn(
@@ -88,13 +89,13 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
             {translationText}
           </p>
 
-          {/* Блюр-оверлей над словом */}
+          {/* 🧊 Блюр как у слова в примере */}
           {isTranslationHidden && (
-            <span className="absolute inset-0 mx-2 my-1 rounded-[12px] border border-white/5 bg-white/10 backdrop-blur-[32px] pointer-events-none" />
+            <span className="absolute inset-0 -m-1 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-[4px] pointer-events-none" />
           )}
         </div>
 
-        {/* 📚 Пример */}
+        {/* Пример */}
         <p className="text-white/60 text-[20px] font-light leading-[30px]">
           {renderExample()}
         </p>
@@ -127,7 +128,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
             <RefreshCcw className="w-6 h-6 text-white/60" />
           </button>
 
-          {/* ✅ "Выучил" */}
+          {/* ✅ Выучил */}
           <button
             onClick={onMarkAsLearned}
             className="h-16 px-5 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 text-white active:bg-white/20"
