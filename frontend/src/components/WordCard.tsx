@@ -80,18 +80,15 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       <div className="flex flex-col gap-5 px-5 flex-1 w-full">
         {/* Перевод */}
         <div className="relative inline-block">
-          <p
-            className={cn(
-              'text-white text-[24px] font-medium leading-[22px] px-2 py-1',
-              isTranslationHidden && 'text-transparent select-none'
-            )}
-          >
-            {translationText}
-          </p>
-
-          {/* 🧊 Блюр как у слова в примере */}
-          {isTranslationHidden && (
-            <span className="absolute inset-0 -m-1 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-[4px] pointer-events-none" />
+          {isTranslationHidden ? (
+            <span className="relative inline-block">
+              <span className="opacity-0 text-[24px] font-medium leading-[22px] text-white">
+                {translationText}
+              </span>
+              <span className="absolute inset-0 px-2 py-1 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-[20px]" />
+            </span>
+          ) : (
+            <p className="text-white text-[24px] font-medium leading-[22px]">{translationText}</p>
           )}
         </div>
 
