@@ -1,17 +1,19 @@
-export const gradients = [
-  'bg-gradient-to-tr from-pink-500 to-yellow-500',
-  'bg-gradient-to-tr from-blue-500 to-purple-600',
-  'bg-gradient-to-tr from-green-400 to-lime-600',
-  'bg-gradient-to-tr from-cyan-500 to-teal-400',
-  'bg-gradient-to-tr from-rose-400 to-fuchsia-500',
-  'bg-gradient-to-tr from-indigo-500 to-sky-400',
-  'bg-gradient-to-tr from-orange-400 to-red-500',
-  'bg-gradient-to-tr from-purple-400 to-pink-500',
-  'bg-gradient-to-tr from-lime-300 to-emerald-500',
-  'bg-gradient-to-tr from-amber-400 to-yellow-500',
-  // … ещё 30+
+// src/utils/gradients.ts
+
+const gradients = [
+  'linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%)',
+  'linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%)',
+  'linear-gradient(135deg, #FDCB82 0%, #F9A1BC 100%)',
+  'linear-gradient(135deg, #89F7FE 0%, #66A6FF 100%)',
+  'linear-gradient(135deg, #C2FFD8 0%, #465EFB 100%)',
+  'linear-gradient(135deg, #FAD0C4 0%, #FFD1FF 100%)',
+  'linear-gradient(135deg, #FFECD2 0%, #FCB69F 100%)',
+  'linear-gradient(135deg, #A1FFCE 0%, #FAFFD1 100%)',
+  'linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%)',
+  'linear-gradient(135deg, #F6D365 0%, #FDA085 100%)',
+  // можно добавить ещё
 ]
 
-export function getRandomGradient() {
-  return gradients[Math.floor(Math.random() * gradients.length)]
+export function generateGradient(index: number) {
+  return gradients[index % gradients.length]
 }
