@@ -29,6 +29,7 @@ export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
         <p className="text-white/80 text-[14px] font-thin leading-[22px]">
           выучено {learnedCount}/{totalCount}
         </p>
+      </div>
 
       {/* Кнопка "загрузить слово" */}
       <button
