@@ -1,47 +1,43 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Volume2, EyeOff, RefreshCcw, Check } from 'lucide-react'
 import { speak } from '../utils/speak'
-import { Button } from '@/components/ui/button'
-
-interface Word {
-  id: number
-  word: string
-  translation: string
-  transcription?: string
-  example: string
-  learned: boolean
-}
 
 interface WordCardProps {
-  word: Word
+  word: {
+    id: number
+    word: string
+    translation: string
+    example: string
+    transcription?: string
+    learned: boolean
+  }
   onMarkAsLearned?: () => void
 }
 
 const gradients = [
-  'linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%)',
-  'linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%)',
-  'linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%)',
-  'linear-gradient(135deg, #FAACA8 0%, #DDD6F3 100%)',
-  'linear-gradient(135deg, #FF8177 0%, #FF867A 100%)',
-  'linear-gradient(135deg, #4AC29A 0%, #BDFFF3 100%)',
-  'linear-gradient(135deg, #43E97B 0%, #38F9D7 100%)',
-  'linear-gradient(135deg, #FF6FD8 0%, #3813C2 100%)',
-  'linear-gradient(135deg, #667EEA 0%, #764BA2 100%)',
-  'linear-gradient(135deg, #30E8BF 0%, #FF8235 100%)',
+  'from-[#FF7E5F] to-[#FEB47B]',
+  'from-[#6A82FB] to-[#FC5C7D]',
+  'from-[#43C6AC] to-[#F8FFAE]',
+  'from-[#FF9A8B] to-[#FF6A88]',
+  'from-[#36D1DC] to-[#5B86E5]',
+  'from-[#B2FEFA] to-[#0ED2F7]',
+  'from-[#FCE38A] to-[#F38181]',
+  'from-[#DCE35B] to-[#45B649]',
+  'from-[#C6FFDD] to-[#FBD786]',
+  'from-[#3CA55C] to-[#B5AC49]',
 ]
+
+const getRandomGradient = () =>
+  gradients[Math.floor(Math.random() * gradients.length)]
 
 export default function WordCard({ word, onMarkAsLearned }: WordCardProps) {
   const [isTranslationHidden, setIsTranslationHidden] = useState(true)
   const [isEnglishFirst, setIsEnglishFirst] = useState(true)
 
-  const gradient = useMemo(() => {
-    const index = word.id % gradients.length
-    return gradients[index]
-  }, [word.id])
-
   const textToDisplay = isEnglishFirst ? word.word : word.translation
   const translation = isEnglishFirst ? word.translation : word.word
+  const gradient = getRandomGradient()
 
   const playAudio = () => speak(word.word)
 
@@ -55,15 +51,15 @@ export default function WordCard({ word, onMarkAsLearned }: WordCardProps) {
         {parts.map((part, i) => (
           <span key={i}>
             {part}
-            {matches?.[i] && (
-              <span className="relative font-bold">
-                {isEnglish || showTranslation ? (
-                  <span>{matches[i]}</span>
+            {matches && matches[i] && (
+              <span className="relative font-bold text-white">
+                {isEnglishFirst || !isTranslationHidden ? (
+                  matches[i]
                 ) : (
-                  <>
+                  <span className="relative inline-block">
                     <span className="text-white">{matches[i]}</span>
-                    <span className="absolute inset-0 rounded-md border border-white/5 bg-white/10 backdrop-blur-sm" />
-                  </>
+                    <span className="absolute inset-0 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-sm" />
+                  </span>
                 )}
               </span>
             )}
@@ -75,73 +71,73 @@ export default function WordCard({ word, onMarkAsLearned }: WordCardProps) {
 
   return (
     <motion.div
-      className="flex flex-col items-start flex-1 w-full h-full rounded-[32px] overflow-hidden px-5 pt-[54px]"
-      style={{ background: gradient }}
-      initial={{ opacity: 0, x: 60 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -60 }}
-      transition={{ duration: 0.4 }}
+      key={word.id}
+      initial={{ x: 60, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -60, opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      layout
+      className={`flex flex-col items-start flex-1 self-stretch rounded-2xl shadow-lg bg-gradient-to-br ${gradient} p-0 overflow-hidden mx-4`}
     >
-      {/* Блок с текстом */}
-      <div className="flex flex-col gap-[20px] w-full px-5">
-        <div className="flex flex-col gap-2">
-          <div className="text-white text-[32px] font-light leading-[22px]">{textToDisplay}</div>
-          {isEnglishFirst && word.transcription && (
-            <div className="text-white/80 text-[16px] font-light leading-[22px] mt-2">
-              {word.transcription}
-            </div>
-          )}
-        </div>
+      {/* Слово + транскрипция */}
+      <div className="flex flex-col gap-2 px-5 pt-6 pb-4 w-full">
+        <h2 className="text-white text-[32px] font-light leading-[22px]">
+          {textToDisplay}
+        </h2>
+        {word.transcription && isEnglishFirst && (
+          <p className="text-sm text-white/80 leading-[22px]">{word.transcription}</p>
+        )}
+      </div>
 
-        <div className="relative text-[24px] font-medium leading-[22px] text-white">
+      {/* Перевод + пример */}
+      <div className="flex flex-col gap-5 px-5 flex-1 self-stretch">
+        <p className="relative text-white text-[24px] font-medium leading-[22px]">
           <span
-            className={`italic relative inline-block transition duration-300 ${
-              isTranslationHidden ? 'blur-[4px] select-none' : ''
+            className={`transition-all duration-300 relative ${
+              isTranslationHidden ? 'select-none text-transparent'
+                : 'text-white'
             }`}
           >
             {translation}
             {isTranslationHidden && (
-              <span className="absolute inset-[-6px] px-2 py-1 rounded-[12px] border border-white/5 bg-white/10 backdrop-blur-2xl z-10" />
+              <span className="absolute inset-[-6px] px-2 py-[6px] rounded-[12px] border border-white/5 bg-white/10 backdrop-blur-[32px]" />
             )}
           </span>
-        </div>
+        </p>
 
-        <div className="text-white/60 text-[20px] leading-[30px] font-light">
+        <p className="text-[20px] text-white/60 font-light leading-[30px]">
           {highlightWordInExample()}
-        </div>
+        </p>
       </div>
 
       {/* Контролы */}
-      <div className="flex px-5 py-5 justify-center items-center gap-1 self-stretch">
-        <div className="flex items-center gap-1 rounded-[24px] bg-white/10 p-1">
-          <Button
-            variant="ghost"
-            className="w-16 h-16 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60"
-            onClick={() => setShowTranslation((prev) => !prev)}
+      <div className="flex px-5 pt-6 pb-8 justify-center items-center gap-2 self-stretch">
+        <div className="flex p-1 items-center gap-1 rounded-[24px] bg-white/10 w-full justify-between">
+          <button
+            onClick={() => setIsTranslationHidden(!isTranslationHidden)}
+            className="w-16 h-16 flex items-center justify-center rounded-[20px] bg-white/10 active:bg-white/20"
           >
-            <EyeOff size={24} />
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-16 h-16 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60"
-            onClick={play}
+            <EyeOff className="w-6 h-6 text-white/60" />
+          </button>
+          <button
+            onClick={playAudio}
+            className="w-16 h-16 flex items-center justify-center rounded-[20px] bg-white/10 active:bg-white/20"
           >
-            <Volume2 size={24} />
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-16 h-16 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60"
-            onClick={() => setIsEnglish((prev) => !prev)}
+            <Volume2 className="w-6 h-6 text-white/60" />
+          </button>
+          <button
+            onClick={() => setIsEnglishFirst(!isEnglishFirst)}
+            className="w-16 h-16 flex items-center justify-center rounded-[20px] bg-white/10 active:bg-white/20"
           >
-            <RefreshCcw size={24} />
-          </Button>
-          <Button
-            variant="ghost"
-            className="h-16 px-5 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60 text-sm font-normal"
+            <RefreshCcw className="w-6 h-6 text-white/60" />
+          </button>
+          <button
+            onClick={onMarkAsLearned}
+            className="h-16 px-5 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 text-white text-sm active:bg-white/20"
           >
-            <Check size={24} className="mr-2" />
-            Выучил
-          </Button>
+            <Check className="w-5 h-5 text-white/60" />
+            <span className="text-white/60">Выучил</span>
+          </button>
         </div>
       </div>
     </motion.div>
