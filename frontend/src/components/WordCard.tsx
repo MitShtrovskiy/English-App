@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { speak } from '../utils/speak'
 import { cn } from '../utils/cn'
 import { getRandomGradient } from '../utils/gradients'
-import styles from './CardStyles'
+import { cardBaseStyles } from './CardStyles'
 
 interface WordCardProps {
   word: {
