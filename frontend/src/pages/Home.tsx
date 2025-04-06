@@ -1,77 +1,78 @@
-// 📦 Импорты
 import { useEffect, useState } from 'react'
-import WordCard from '@/components/WordCard'
-import { fetchWords } from '@/api'
-import { Word } from '@/types'
-import { AnimatePresence, motion } from 'framer-motion'
-import Navbar from '@/components/Navbar'
+import { getWords } from '../api'
+import { Word } from '../types'
+import WordCard from '../components/WordCard'
+import Navbar from '../components/Navbar'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import '../styles/home.css'
 
-// 🎨 Стили и логика карточек
 export default function Home() {
   const [words, setWords] = useState<Word[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [direction, setDirection] = useState<'left' | 'right'>('right')
 
   useEffect(() => {
-    const loadWords = async () => {
-      const data = await fetchWords()
+    const fetchWords = async () => {
+      const data = await getWords()
       setWords(data)
-      setLoading(false)
     }
-
-    loadWords()
+    fetchWords()
   }, [])
 
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % words.length)
+  const handlePrev = () => {
+    if (isAnimating) return
+    setDirection('left')
+    setIsAnimating(true)
+    setTimeout(() => {
+      setCurrentIndex((prevIndex) =>
+        prevIndex === 0 ? words.length - 1 : prevIndex - 1
+      )
+      setIsAnimating(false)
+    }, 300)
   }
 
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length)
+  const handleNext = () => {
+    if (isAnimating) return
+    setDirection('right')
+    setIsAnimating(true)
+    setTimeout(() => {
+      setCurrentIndex((prevIndex) =>
+        prevIndex === words.length - 1 ? 0 : prevIndex + 1
+      )
+      setIsAnimating(false)
+    }, 300)
   }
 
   const currentWord = words[currentIndex]
 
   return (
-    <div className="flex flex-col w-[440px] h-[956px] pt-[54px] items-start flex-shrink-0 bg-black text-white mx-auto overflow-hidden">
-      {/* 🔝 Верхний навбар */}
-      <Navbar />
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* 🔼 Навбар */}
+      <Navbar words={words} />
 
-      {/* 📄 Карточка слова */}
-      <div className="flex flex-col items-start flex-1 w-full px-4">
-        {loading ? (
-          <div className="text-white text-center w-full">Загрузка...</div>
-        ) : words.length === 0 ? (
-          <div className="text-white text-center w-full">Слов нет</div>
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentWord.id}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.3 }}
-              className="w-full"
-            >
-              <WordCard word={currentWord} />
-            </motion.div>
-          </AnimatePresence>
-        )}
+      {/* 📦 Карточка */}
+      <div
+        className={`safe-area-container px-4 flex justify-center transition-transform duration-500 ${
+          isAnimating ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''
+        }`}
+      >
+        {currentWord && <WordCard word={currentWord} />}
       </div>
 
-      {/* ⬅️➡️ Кнопки навигации */}
-      <div className="flex px-[40px] pb-[56px] pt-[12px] justify-center items-center gap-[8px] self-stretch">
+      {/* ⬅️➡️ Навигация */}
+      <div className="flex px-10 pb-14 pt-3 gap-2 w-full justify-center items-center">
         <button
-          onClick={goToPrevious}
-          className="flex h-[64px] flex-col justify-center items-center gap-[10px] flex-[1_0_0] rounded-[20px] bg-white/10 text-white active:bg-white/10"
+          onClick={handlePrev}
+          className="h-16 flex-1 bg-white/10 rounded-2xl flex items-center justify-center text-white text-lg active:bg-white/10"
         >
-          ← Назад
+          <ArrowLeft className="w-6 h-6" />
         </button>
         <button
-          onClick={goToNext}
-          className="flex h-[64px] flex-col justify-center items-center gap-[10px] flex-[1_0_0] rounded-[20px] bg-white/10 text-white active:bg-white/10"
+          onClick={handleNext}
+          className="h-16 flex-1 bg-white/10 rounded-2xl flex items-center justify-center text-white text-lg active:bg-white/10"
         >
-          Вперёд →
+          <ArrowRight className="w-6 h-6" />
         </button>
       </div>
     </div>
