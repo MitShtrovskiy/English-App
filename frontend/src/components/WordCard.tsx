@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { Volume2, EyeOff, RefreshCcw, Check } from 'lucide-react'
 import { speak } from '../utils/speak'
-import { cn } from '../utils/cn' // утилита для className
-
-interface Word {
-  id: number
-  word: string
-  translation: string
-  example: string
-  transcription?: string
-  learned: boolean
-}
+import { motion } from 'framer-motion'
+import { getRandomGradient } from '../utils/gradients'
 
 interface WordCardProps {
-  word: Word
-  gradient: string // Градиент передаётся из Home
-  onMarkAsLearned: () => void
+  word: {
+    id: number
+    word: string
+    translation: string
+    transcription?: string
+    example: string
+    learned: boolean
+  }
+  onMarkAsLearned?: () => void
+  index: number
+  currentIndex: number
 }
 
-export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardProps) {
+export default function WordCard({
+  word,
+  onMarkAsLearned,
+  index,
+  currentIndex,
+}: WordCardProps) {
   const [isTranslationHidden, setIsTranslationHidden] = useState(true)
   const [isEnglishFirst, setIsEnglishFirst] = useState(true)
+  const [bgGradient, setBgGradient] = useState(getRandomGradient())
 
-  const mainText = isEnglishFirst ? word.word : word.translation
-  const translationText = isEnglishFirst ? word.translation : word.word
+  // Меняем градиент только при смене карточки
+  useEffect(() => {
+    if (index === currentIndex) {
+      setBgGradient(getRandomGradient())
+    }
+  }, [index, currentIndex])
 
-  // 🎧 Озвучка
+  const textToDisplay = isEnglishFirst ? word.word : word.translation
+  const translation = isEnglishFirst ? word.translation : word.word
+
   const playAudio = () => speak(word.word)
 
-  // 🧠 Пример с выделением слова
+  // 🔤 Отображение слова в примере с блюром при нужных условиях
   const renderExample = () => {
     const regex = new RegExp(`\\b${word.word}\\b`, 'gi')
     const parts = word.example.split(regex)
@@ -45,9 +56,9 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
                 {isEnglishFirst || !isTranslationHidden ? (
                   matches[i]
                 ) : (
-                  <span className="relative inline-block">
+                  <span className="relative inline-block px-2">
                     <span className="opacity-0">{matches[i]}</span>
-                    <span className="absolute inset-0 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-sm" />
+                    <span className="absolute inset-0 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-[4px]" />
                   </span>
                 )}
               </span>
@@ -60,79 +71,75 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
 
   return (
     <motion.div
+      className="flex flex-col w-full h-full rounded-[32px] overflow-hidden px-0"
+      style={{
+        background: bgGradient,
+      }}
       key={word.id}
-      layout
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
-      transition={{ duration: 0.3 }}
-      // 🧱 Контейнер карточки
-      className="flex flex-col items-start flex-1 w-full h-full rounded-[32px] overflow-hidden"
-      style={{ background: gradient }}
+      transition={{ duration: 0.4 }}
     >
-      {/* 🔠 Блок слова + транскрипция */}
-      <div className="flex flex-col px-5 pt-6 pb-5 gap-2 w-full">
-        <h2 className="text-white text-[32px] font-light leading-[22px]">{mainText}</h2>
-        {word.transcription && isEnglishFirst && (
-          <p className="text-white/80 text-[16px] font-light leading-[22px] mt-2">{word.transcription}</p>
+      {/* 🧠 Блок со словом и транскрипцией */}
+      <div className="flex flex-col px-5 pt-6 gap-2">
+        <h2 className="text-white text-[32px] font-light leading-[22px]">
+          {textToDisplay}
+        </h2>
+        {isEnglishFirst && word.transcription && (
+          <p className="text-[16px] font-light text-white/80 leading-[22px] mt-2">
+            {word.transcription}
+          </p>
         )}
       </div>
 
-      {/* 📘 Блок перевода и примера */}
-      <div className="flex flex-col gap-5 px-5 flex-1 w-full">
-        {/* Перевод */}
-        <div className="relative inline-block">
-          <p
-            className={cn(
-              'text-white text-[24px] font-medium leading-[22px] transition duration-300 px-2 py-1',
-              isTranslationHidden &&
-                'rounded-[12px] border border-white/5 bg-white/10 backdrop-blur-[32px] text-transparent select-none'
-            )}
-          >
-            {translationText}
-          </p>
-        </div>
+      {/* 🌐 Перевод (с блюром по умолчанию) */}
+      <div className="px-5 pt-6">
+        <p
+          className={`text-[24px] font-medium leading-[22px] text-white relative inline-block transition duration-300 ${
+            isTranslationHidden ? 'blur-sm select-none' : ''
+          }`}
+        >
+          {translation}
+        </p>
+      </div>
 
-        {/* Пример */}
-        <p className="text-white/60 text-[20px] font-light leading-[30px]">
+      {/* 📘 Пример использования слова */}
+      <div className="flex flex-col gap-5 px-5 pt-6 flex-1 justify-center">
+        <p className="text-[20px] font-light leading-[30px] text-white/60">
           {renderExample()}
         </p>
       </div>
 
-      {/* 🎛 Контролы */}
-      <div className="flex justify-center items-center w-full px-5 py-5">
-        <div className="flex items-center gap-1 rounded-[24px] bg-white/10 p-1">
-          {/* 👁 Показать перевод */}
+      {/* 🎛️ Контролы (Sound, Eye, Toggle, Выучил) */}
+      <div className="flex justify-center items-center gap-[6px] px-5 pb-6">
+        <div className="flex items-center gap-[4px] p-[4px] rounded-[24px] bg-white/10">
           <button
             onClick={() => setIsTranslationHidden(!isTranslationHidden)}
-            className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10 active:bg-white/20"
+            className={`w-[64px] h-[64px] flex justify-center items-center rounded-[20px] ${
+              isTranslationHidden ? 'bg-white/12' : 'bg-white/24'
+            }`}
           >
-            <EyeOff className="w-6 h-6 text-white/60" />
+            <EyeOff size={24} color="#ffffff99" />
           </button>
-
-          {/* 🔊 Озвучить */}
           <button
             onClick={playAudio}
-            className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10 active:bg-white/20"
+            className="w-[64px] h-[64px] flex justify-center items-center rounded-[20px] bg-white/12"
           >
-            <Volume2 className="w-6 h-6 text-white/60" />
+            <Volume2 size={24} color="#ffffff99" />
           </button>
-
-          {/* 🔁 Переключить язык */}
           <button
             onClick={() => setIsEnglishFirst(!isEnglishFirst)}
-            className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10 active:bg-white/20"
+            className="w-[64px] h-[64px] flex justify-center items-center rounded-[20px] bg-white/12"
           >
-            <RefreshCcw className="w-6 h-6 text-white/60" />
+            <RefreshCcw size={24} color="#ffffff99" />
           </button>
-
-          {/* ✅ Выучил */}
           <button
             onClick={onMarkAsLearned}
-            className="h-16 px-5 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 text-white active:bg-white/20"
+            className="h-[64px] px-6 flex justify-center items-center gap-[10px] rounded-[20px] bg-white/12 text-white text-sm font-medium"
           >
-            <Check className="w-5 h-5 text-white/60" />
-            <span className="text-sm font-medium text-white/60">Выучил</span>
+            <Check size={24} color="#ffffff99" />
+            Выучил
           </button>
         </div>
       </div>
