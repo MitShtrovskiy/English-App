@@ -1,66 +1,81 @@
 import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Navbar from '../components/Navbar'
 import WordCard from '../components/WordCard'
 import { api } from '../utils/api'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [direction, setDirection] = useState<'left' | 'right'>('right')
 
-  // 🔄 Загрузка слов с бэкенда
+  // Получаем список слов с бэка
   const fetchWords = async () => {
-    try {
-      const res = await api.get('/words')
-      setWords(res.data.filter((word: any) => !word.learned))
-      setCurrentIndex(0)
-    } catch (err) {
-      console.error(err)
-    }
+    const res = await api.get('/words')
+    setWords(res.data)
   }
 
   useEffect(() => {
     fetchWords()
   }, [])
 
-  // 🔁 Навигация
-  const nextCard = () => {
+  const handleNext = () => {
+    setDirection('right')
     setCurrentIndex((prev) => (prev + 1) % words.length)
   }
 
-  const prevCard = () => {
-    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length)
+  const handlePrev = () => {
+    setDirection('left')
+    setCurrentIndex((prev) =>
+      prev === 0 ? words.length - 1 : prev - 1
+    )
   }
 
   const currentWord = words[currentIndex]
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-screen max-w-[440px] mx-auto pt-[54px] overflow-hidden">
-      {/* 🧠 Контент карточки */}
-      <div className="flex flex-col items-start w-full h-full flex-1">
-        {currentWord ? (
-          <WordCard word={currentWord} onRefresh={fetchWords} />
-        ) : (
-          <div className="text-center text-white/50">Все слова выучены 🎉</div>
-        )}
-      </div>
+    <div className="relative flex flex-col items-center w-full max-w-[440px] mx-auto h-[100dvh] bg-black overflow-hidden">
+      {/* Навбар со счётчиком и прогресс-баром */}
+      <Navbar
+        totalCount={words.length}
+        learnedCount={words.filter((word) => word.learned).length}
+      />
 
-      {/* 🔽 Навигация */}
-      <div className="flex px-10 pb-14 pt-3 gap-2 w-full">
-        <Button
-          onClick={prevCard}
-          className="flex flex-col justify-center items-center h-16 flex-1 rounded-[20px] bg-white/10 text-white"
-        >
-          <ChevronLeft className="w-6 h-6" />
-          Назад
-        </Button>
-        <Button
-          onClick={nextCard}
-          className="flex flex-col justify-center items-center h-16 flex-1 rounded-[20px] bg-white/10 text-white"
-        >
-          <ChevronRight className="w-6 h-6" />
-          Вперёд
-        </Button>
+      {/* Область карточки */}
+      <div className="flex flex-col items-start w-full h-full px-0 pt-[54px]">
+        <div className="flex-1 w-full relative overflow-hidden">
+          <AnimatePresence mode="wait">
+            {currentWord && (
+              <motion.div
+                key={currentWord.id}
+                initial={{ x: direction === 'right' ? 300 : -300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: direction === 'right' ? -300 : 300, opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute top-0 left-0 w-full h-full px-0"
+              >
+                <WordCard word={currentWord} onRefresh={fetchWords} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Кнопки навигации */}
+        <div className="flex justify-center items-center gap-2 px-10 pb-14 pt-6 w-full">
+          <button
+            onClick={handlePrev}
+            className="flex h-[64px] flex-col justify-center items-center gap-[10px] flex-[1_0_0] rounded-[20px] bg-white/10 text-white text-sm"
+          >
+            Назад
+          </button>
+          <button
+            onClick={handleNext}
+            className="flex h-[64px] flex-col justify-center items-center gap-[10px] flex-[1_0_0] rounded-[20px] bg-white/10 text-white text-sm"
+          >
+            Вперёд
+          </button>
+        </div>
       </div>
     </div>
   )

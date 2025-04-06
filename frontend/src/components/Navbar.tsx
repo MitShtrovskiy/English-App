@@ -1,31 +1,51 @@
 import { useNavigate } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { ReactComponent as ListIcon } from '@/assets/icons/list.svg'
-import { ReactComponent as DownloadIcon } from '@/assets/icons/download.svg'
+import { List, Download } from 'lucide-react'
 
-export default function Navbar() {
+interface NavbarProps {
+  totalCount: number
+  learnedCount: number
+}
+
+export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
   const navigate = useNavigate()
 
-  return (
-    <div className="flex p-5 gap-5 w-full max-w-[440px] mx-auto">
-      <Button
-        className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10"
-        onClick={() => navigate('/list')}
-      >
-        <ListIcon />
-      </Button>
+  const progress = totalCount === 0 ? 0 : (learnedCount / totalCount) * 100
 
-      <div className="flex flex-col justify-center flex-1 gap-1">
-        <h1 className="text-[24px] font-light text-white leading-[22px]">Изучение слов</h1>
-        <p className="text-sm text-white/80 font-extralight leading-[22px]">Выучено 2/40</p>
+  return (
+    <div className="flex items-start gap-5 p-5 w-full">
+      {/* Кнопка "список слов" */}
+      <button
+        onClick={() => navigate('/word-list')}
+        className="flex w-[64px] h-[64px] flex-col justify-center items-center gap-2 rounded-[20px] bg-white/10"
+      >
+        <List className="w-6 h-6 text-white/60" />
+      </button>
+
+      {/* Заголовок, счётчик и прогресс-бар */}
+      <div className="flex flex-col justify-center items-start gap-1 flex-1 pt-[2px]">
+        <h1 className="text-white text-[24px] font-light leading-[22px]">
+          Изучение слов
+        </h1>
+        <p className="text-white/80 text-[14px] font-thin leading-[22px]">
+          выучено {learnedCount}/{totalCount}
+        </p>
+
+        {/* Прогресс-бар */}
+        <div className="w-full h-2 bg-white/10 rounded-full mt-1 overflow-hidden">
+          <div
+            className="h-full bg-white/80 rounded-full transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
 
-      <Button
-        className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10"
-        onClick={() => alert('Загрузка нового слова')}
+      {/* Кнопка "загрузить слово" */}
+      <button
+        onClick={() => navigate('/upload')}
+        className="flex w-[64px] h-[64px] flex-col justify-center items-center gap-2 rounded-[20px] bg-white/10"
       >
-        <DownloadIcon />
-      </Button>
+        <Download className="w-6 h-6 text-white/60" />
+      </button>
     </div>
   )
 }
