@@ -77,7 +77,7 @@ export default function WordCard({ word, onMarkAsLearned }: WordCardProps) {
       exit={{ x: -60, opacity: 0 }}
       transition={{ duration: 0.3 }}
       layout
-      className={`flex flex-col items-start flex-1 self-stretch rounded-2xl shadow-lg bg-gradient-to-br ${gradient} p-0 overflow-hidden mx-4`}
+      className={`flex flex-col items-start flex-1 self-stretch rounded-2xl shadow-lg bg-gradient-to-br ${gradient} overflow-hidden`}
     >
       {/* Слово + транскрипция */}
       <div className="flex flex-col gap-2 px-5 pt-6 pb-4 w-full">
