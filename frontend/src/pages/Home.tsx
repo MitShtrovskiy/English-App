@@ -1,77 +1,59 @@
+// src/pages/Home.tsx
 import { useEffect, useState } from 'react'
-import WordCard from '../components/WordCard'
 import { api } from '../utils/api'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import WordCard from '../components/WordCard'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import '../styles/wordCardStyles.css'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
-  const [current, setCurrent] = useState(0)
-  const [isEnglish, setIsEnglish] = useState(true)
-  const [showTranslation, setShowTranslation] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     api.get('/words').then((res) => {
-      setWords(res.data.filter((w: any) => !w.learned))
+      setWords(res.data)
+      setIsLoading(false)
     })
   }, [])
 
   const nextCard = () => {
-    setCurrent((prev) => (prev + 1) % words.length)
-    setIsEnglish(true)
-    setShowTranslation(false)
+    setCurrentIndex((prev) => (prev + 1) % words.length)
   }
 
   const prevCard = () => {
-    setCurrent((prev) => (prev - 1 + words.length) % words.length)
-    setIsEnglish(true)
-    setShowTranslation(false)
+    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length)
   }
 
-  const handleMarkAsLearned = (id: number) => {
-    api.patch(`/words/${id}`, { learned: true }).then(() => {
-      setWords((prev) => prev.filter((w) => w.id !== id))
-      setCurrent((prev) => (prev >= words.length - 1 ? 0 : prev))
-    })
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-white text-lg">
+        Загрузка...
+      </div>
+    )
   }
 
-  const word = words[current]
+  const currentWord = words[currentIndex]
 
   return (
-    <div className="flex flex-col min-h-screen w-full max-w-[430px] mx-auto px-4 pb-8 pt-[72px] relative overflow-hidden">
-      {word ? (
-        <>
-          <div className="flex-1 flex items-start">
-            <WordCard
-              word={word}
-              isEnglish={isEnglish}
-              showTranslation={showTranslation}
-              onToggleLanguage={() => setIsEnglish((prev) => !prev)}
-              onToggleTranslation={() => setShowTranslation((prev) => !prev)}
-              onMarkAsLearned={() => handleMarkAsLearned(word.id)}
-            />
-          </div>
+    <div className="relative max-w-[430px] mx-auto flex flex-col items-center justify-between h-screen overflow-hidden">
+      {/* Карточка */}
+      <div className="flex-grow flex items-center justify-center px-4 pt-[60px] pb-[110px] w-full">
+        <WordCard word={currentWord} />
+      </div>
 
-          {/* 🔽 Навигация */}
-          <div className="flex gap-4 mt-6">
-            <button
-              onClick={prevCard}
-              className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10"
-            >
-              <ChevronLeft className="w-6 h-6" />
-              <span className="text-sm text-white">Назад</span>
-            </button>
-            <button
-              onClick={nextCard}
-              className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10"
-            >
-              <ChevronRight className="w-6 h-6" />
-              <span className="text-sm text-white">Вперёд</span>
-            </button>
-          </div>
-        </>
-      ) : (
-        <div className="text-center text-white text-lg mt-20">🎉 Все слова выучены!</div>
-      )}
+      {/* Кнопки навигации */}
+      <div className="flex justify-between w-full px-4 pb-6 gap-3 z-10">
+        <Button className="nav-button" onClick={prevCard}>
+          <ArrowLeft className="mr-2" />
+          Назад
+        </Button>
+        <Button className="nav-button" onClick={nextCard}>
+          Вперед
+          <ArrowRight className="ml-2" />
+        </Button>
+      </div>
     </div>
   )
 }
