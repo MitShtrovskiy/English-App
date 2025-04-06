@@ -4,16 +4,15 @@ import { Button } from '@/components/ui/button'
 
 export default function Navbar() {
   const navigate = useNavigate()
-
+  
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-14 px-4 flex items-center justify-between bg-zinc-900/70 backdrop-blur-md border-b border-zinc-800 max-w-[430px] mx-auto">
-      {/* ✅ изменён путь на /list */}
-      <Button variant="ghost" size="icon" onClick={() => navigate('/list')}>
-        <List className="w-5 h-5" />
-      </Button>
-      <Button variant="ghost" size="icon" onClick={() => alert('Загрузка новых слов')}>
-        <Download className="w-5 h-5" />
-      </Button>
+    <div className="w-full flex items-center justify-between px-4 py-4 bg-black/30 backdrop-blur-sm z-10">
+      <button onClick={() => navigate('/words')} className="text-white opacity-80">
+        <List className="w-6 h-6" />
+      </button>
+      <button onClick={() => navigate('/upload')} className="text-white opacity-80">
+        <Upload className="w-6 h-6" />
+      </button>
     </div>
   )
 }
