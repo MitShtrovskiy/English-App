@@ -66,7 +66,7 @@ export default function Home() {
       </div>
 
       {/* Кнопки навигации */}
-      <div className="flex justify-center items-center gap-2 px-10 pb-14 pt-3 w-full">
+      <div className="flex justify-center items-center gap-2 px-10 pb-4 pt-3 w-full">
         <button
           onClick={handlePrev}
           className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10 text-white"
