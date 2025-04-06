@@ -69,7 +69,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       style={{ background: gradient }}
     >
       {/* 🔠 Блок слова и транскрипции */}
-      <div className="flex flex-col px-5 pt-6 pb-6 gap-2 w-full" style={{ height: '108px' }}>
+      <div className="flex flex-col px-5 pt-8 pb-6 gap-2 w-full" style={{ height: '108px' }}>
         <h2 className="text-white text-[32px] font-light leading-[22px]">{mainText}</h2>
         {word.transcription && isEnglishFirst && (
           <p className="text-white/80 text-[16px] font-light leading-[22px] mt-2">{word.transcription}</p>
@@ -77,7 +77,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       </div>
 
       {/* 📘 Перевод и пример */}
-      <div className="flex flex-col gap-5 px-5 flex-1 w-full">
+      <div className="flex flex-col gap-5 px-5 py-5 flex-1 w-full">
         {/* Перевод */}
         <div className="relative inline-block" style={{ height: '40px' }}>
           {isTranslationHidden ? (
@@ -99,7 +99,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       </div>
 
       {/* 🎛 Контролы */}
-      <div className="flex justify-center items-center w-full px-5 py-5">
+      <div className="flex justify-center items-center w-full px-5 py-5 pb-6">
         <div className="flex items-center gap-1 rounded-[24px] bg-white/10 p-1">
           {/* 👁 HideTranslation */}
           <button
