@@ -75,7 +75,7 @@ export default function WordCard({ word, onMarkAsLearned }: WordCardProps) {
       style={{ background: gradient }}
     >
       {/* Блок слова и транскрипции */}
-      <div className="flex flex-col gap-2 p-[24px_20px_20px_20px] items-start w-full">
+      <div className="flex flex-col gap-2 p-[32px_20px_20px_20px] items-start w-full">
         <h2 className="text-white text-[32px] leading-[22px] font-light">
           {displayedWord}
         </h2>
