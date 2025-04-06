@@ -1,13 +1,17 @@
 export const gradients = [
-  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)',
-  'linear-gradient(135deg, #f54ea2 0%, #ff7676 100%)',
-  'linear-gradient(135deg, #42e695 0%, #3bb2b8 100%)',
-  'linear-gradient(135deg, #ff6a00 0%, #ee0979 100%)',
-  'linear-gradient(135deg, #614385 0%, #516395 100%)',
-  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-  'linear-gradient(135deg, #e65c00 0%, #f9d423 100%)',
-  'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-  'linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%)',
-  // добавь ещё при желании
+  'bg-gradient-to-tr from-pink-500 to-yellow-500',
+  'bg-gradient-to-tr from-blue-500 to-purple-600',
+  'bg-gradient-to-tr from-green-400 to-lime-600',
+  'bg-gradient-to-tr from-cyan-500 to-teal-400',
+  'bg-gradient-to-tr from-rose-400 to-fuchsia-500',
+  'bg-gradient-to-tr from-indigo-500 to-sky-400',
+  'bg-gradient-to-tr from-orange-400 to-red-500',
+  'bg-gradient-to-tr from-purple-400 to-pink-500',
+  'bg-gradient-to-tr from-lime-300 to-emerald-500',
+  'bg-gradient-to-tr from-amber-400 to-yellow-500',
+  // … ещё 30+
 ]
+
+export function getRandomGradient() {
+  return gradients[Math.floor(Math.random() * gradients.length)]
+}

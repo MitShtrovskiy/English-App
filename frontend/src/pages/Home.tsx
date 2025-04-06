@@ -1,75 +1,77 @@
 import { useEffect, useState } from 'react'
-import { api } from '../utils/api'
 import WordCard from '../components/WordCard'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/utils/cn'
+import { api } from '../utils/api'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { gradients } from '@/utils/gradients'
 
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [showControls, setShowControls] = useState(true)
+  const [current, setCurrent] = useState(0)
+  const [isEnglish, setIsEnglish] = useState(true)
+  const [showTranslation, setShowTranslation] = useState(false)
 
   useEffect(() => {
-    api.get('/words').then((res) => setWords(res.data))
+    api.get('/words').then((res) => {
+      setWords(res.data.filter((w: any) => !w.learned))
+    })
   }, [])
 
-  const currentWord = words[currentIndex]
-  const goNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % words.length)
+  const nextCard = () => {
+    setCurrent((prev) => (prev + 1) % words.length)
+    setIsEnglish(true)
+    setShowTranslation(false)
   }
 
-  const goPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length)
+  const prevCard = () => {
+    setCurrent((prev) => (prev - 1 + words.length) % words.length)
+    setIsEnglish(true)
+    setShowTranslation(false)
   }
 
-  const gradientIndex = currentWord?.id % gradients.length
-  const bgGradient = gradients[gradientIndex]
+  const handleMarkAsLearned = (id: number) => {
+    api.patch(`/words/${id}`, { learned: true }).then(() => {
+      setWords((prev) => prev.filter((w) => w.id !== id))
+      setCurrent((prev) => (prev >= words.length - 1 ? 0 : prev))
+    })
+  }
+
+  const word = words[current]
 
   return (
-    <div
-      className="relative flex flex-col items-center justify-between w-full min-h-screen text-white overflow-hidden"
-      style={{
-        background: bgGradient,
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}
-    >
-      <div className="w-full max-w-[430px] px-4 pt-[70px]">
-        <AnimatePresence mode="wait">
-          {currentWord && (
-            <motion.div
-              key={currentWord.id}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.3 }}
-            >
-              <WordCard word={currentWord} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+    <div className="flex flex-col min-h-screen w-full max-w-[430px] mx-auto px-4 pb-8 pt-[72px] relative overflow-hidden">
+      {word ? (
+        <>
+          <div className="flex-1 flex items-start">
+            <WordCard
+              word={word}
+              isEnglish={isEnglish}
+              showTranslation={showTranslation}
+              onToggleLanguage={() => setIsEnglish((prev) => !prev)}
+              onToggleTranslation={() => setShowTranslation((prev) => !prev)}
+              onMarkAsLearned={() => handleMarkAsLearned(word.id)}
+            />
+          </div>
 
-      {/* Контролы вынесены сюда */}
-      <div className="flex justify-between items-center gap-4 px-4 pt-6 pb-10 w-full max-w-[430px]">
-        <Button
-          onClick={goPrev}
-          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          Назад
-        </Button>
-        <Button
-          onClick={goNext}
-          className="flex h-16 flex-col justify-center items-center gap-2 flex-1 rounded-[20px] bg-white/10"
-        >
-          <ChevronRight className="h-5 w-5" />
-          Вперёд
-        </Button>
-      </div>
+          {/* 🔽 Навигация */}
+          <div className="flex gap-4 mt-6">
+            <button
+              onClick={prevCard}
+              className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10"
+            >
+              <ChevronLeft className="w-6 h-6" />
+              <span className="text-sm text-white">Назад</span>
+            </button>
+            <button
+              onClick={nextCard}
+              className="flex flex-col justify-center items-center gap-2 flex-1 h-16 rounded-[20px] bg-white/10"
+            >
+              <ChevronRight className="w-6 h-6" />
+              <span className="text-sm text-white">Вперёд</span>
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="text-center text-white text-lg mt-20">🎉 Все слова выучены!</div>
+      )}
     </div>
   )
 }
