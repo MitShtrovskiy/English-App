@@ -55,15 +55,15 @@ export default function WordCard({ word, onMarkAsLearned }: WordCardProps) {
         {parts.map((part, i) => (
           <span key={i}>
             {part}
-            {matches && matches[i] && (
-              <span className="relative font-semibold">
-                {isEnglishFirst || !isTranslationHidden ? (
-                  <span className="font-bold">{matches[i]}</span>
+            {matches?.[i] && (
+              <span className="relative font-bold">
+                {isEnglish || showTranslation ? (
+                  <span>{matches[i]}</span>
                 ) : (
-                  <span className="relative inline-block px-2 py-1">
-                    <span className="text-white font-bold relative z-10">{matches[i]}</span>
+                  <>
+                    <span className="text-white">{matches[i]}</span>
                     <span className="absolute inset-0 rounded-md border border-white/5 bg-white/10 backdrop-blur-sm" />
-                  </span>
+                  </>
                 )}
               </span>
             )}
@@ -112,33 +112,36 @@ export default function WordCard({ word, onMarkAsLearned }: WordCardProps) {
       </div>
 
       {/* Контролы */}
-      <div className="mt-auto w-full px-5 pt-10">
-        <div className="flex justify-center items-center gap-2 p-4 bg-white/10 rounded-[24px]">
-          <button
-            className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10 hover:bg-white/20"
-            onClick={() => setIsTranslationHidden(!isTranslationHidden)}
+      <div className="flex px-5 py-5 justify-center items-center gap-1 self-stretch">
+        <div className="flex items-center gap-1 rounded-[24px] bg-white/10 p-1">
+          <Button
+            variant="ghost"
+            className="w-16 h-16 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60"
+            onClick={() => setShowTranslation((prev) => !prev)}
           >
-            <EyeOff className="w-6 h-6 text-white/60" />
-          </button>
-          <button
-            className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10 hover:bg-white/20"
-            onClick={playAudio}
+            <EyeOff size={24} />
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-16 h-16 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60"
+            onClick={play}
           >
-            <Volume2 className="w-6 h-6 text-white/60" />
-          </button>
-          <button
-            className="w-16 h-16 flex justify-center items-center rounded-[20px] bg-white/10 hover:bg-white/20"
-            onClick={() => setIsEnglishFirst(!isEnglishFirst)}
+            <Volume2 size={24} />
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-16 h-16 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60"
+            onClick={() => setIsEnglish((prev) => !prev)}
           >
-            <RefreshCcw className="w-6 h-6 text-white/60" />
-          </button>
-          <button
-            className="flex items-center gap-2 px-6 h-16 rounded-[20px] bg-white/10 hover:bg-white/20 text-white text-sm font-medium"
-            onClick={onMarkAsLearned}
+            <RefreshCcw size={24} />
+          </Button>
+          <Button
+            variant="ghost"
+            className="h-16 px-5 bg-white/10 hover:bg-white/20 rounded-[20px] text-white/60 text-sm font-normal"
           >
-            <Check className="w-5 h-5" />
+            <Check size={24} className="mr-2" />
             Выучил
-          </button>
+          </Button>
         </div>
       </div>
     </motion.div>
