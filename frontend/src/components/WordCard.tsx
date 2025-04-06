@@ -26,10 +26,8 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
   const mainText = isEnglishFirst ? word.word : word.translation
   const translationText = isEnglishFirst ? word.translation : word.word
 
-  // 🔊 Озвучка
   const playAudio = () => speak(word.word)
 
-  // 📘 Пример с выделением слова
   const renderExample = () => {
     const regex = new RegExp(`\\b${word.word}\\b`, 'gi')
     const parts = word.example.split(regex)
@@ -66,11 +64,10 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
       transition={{ duration: 0.3 }}
-      // 🎴 Контейнер карточки
       className="flex flex-col items-start flex-1 w-full h-full rounded-[32px] overflow-hidden"
       style={{ background: gradient }}
     >
-      {/* 🔠 Слово + транскрипция (фиксированная высота) */}
+      {/* 🔠 Блок слова + транскрипция (64px высота) */}
       <div className="flex flex-col px-5 pt-6 pb-5 gap-2 w-full" style={{ height: '64px' }}>
         <h2 className="text-white text-[32px] font-light leading-[22px]">{mainText}</h2>
         {word.transcription && isEnglishFirst && (
@@ -80,26 +77,30 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
 
       {/* 📘 Перевод + пример */}
       <div className="flex flex-col gap-5 px-5 flex-1 w-full">
-        {/* 🔄 Перевод с блюром */}
+        {/* 🔄 Перевод */}
         <div className="relative inline-block">
           <p
             className={cn(
-              'text-white text-[24px] font-medium leading-[22px] transition duration-300 px-2 py-1',
-              isTranslationHidden &&
-                'rounded-[12px] border border-white/5 bg-white/10 backdrop-blur-[32px] text-transparent select-none'
+              'text-white text-[24px] font-medium leading-[22px] px-2 py-1',
+              isTranslationHidden && 'text-transparent select-none'
             )}
           >
             {translationText}
           </p>
+
+          {/* Блюр-оверлей над словом */}
+          {isTranslationHidden && (
+            <span className="absolute inset-0 mx-2 my-1 rounded-[12px] border border-white/5 bg-white/10 backdrop-blur-[32px] pointer-events-none" />
+          )}
         </div>
 
-        {/* 📚 Пример с возможным блюром */}
+        {/* 📚 Пример */}
         <p className="text-white/60 text-[20px] font-light leading-[30px]">
           {renderExample()}
         </p>
       </div>
 
-      {/* 🎛 Контролы управления */}
+      {/* 🎛 Контролы */}
       <div className="flex justify-center items-center w-full px-5 py-5">
         <div className="flex items-center gap-1 rounded-[24px] bg-white/10 p-1">
           {/* 👁 HideTranslation */}
@@ -126,7 +127,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
             <RefreshCcw className="w-6 h-6 text-white/60" />
           </button>
 
-          {/* ✅ Кнопка "Выучил" */}
+          {/* ✅ "Выучил" */}
           <button
             onClick={onMarkAsLearned}
             className="h-16 px-5 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 text-white active:bg-white/20"
