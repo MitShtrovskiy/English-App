@@ -21,7 +21,6 @@ export default function App() {
           <Route path="/words" element={<WordListPage />} />
           <Route path="/upload" element={<UploadPage />} />
         </Routes>
-        <Navbar />
       </div>
     </Router>
   )
