@@ -99,7 +99,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       </div>
 
       {/* 🎛 Контролы */}
-      <div className="flex justify-center items-center w-full px-5 py-5 pb-6">
+      <div className="flex justify-center items-center w-full px-5 py-5 pb-10">
         <div className="flex items-center gap-1 rounded-[24px] bg-white/10 p-1">
           {/* 👁 HideTranslation */}
           <button

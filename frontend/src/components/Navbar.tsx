@@ -30,15 +30,6 @@ export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
           выучено {learnedCount}/{totalCount}
         </p>
 
-        {/* Прогресс-бар */}
-        <div className="w-full h-2 bg-white/10 rounded-full mt-1 overflow-hidden">
-          <div
-            className="h-full bg-white/80 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
       {/* Кнопка "загрузить слово" */}
       <button
         onClick={() => navigate('/upload')}
