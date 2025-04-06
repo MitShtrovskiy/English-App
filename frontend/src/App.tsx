@@ -26,6 +26,5 @@ export default function App() {
         <Navbar />
       </div>
     </Router>
-    
   )
 }
