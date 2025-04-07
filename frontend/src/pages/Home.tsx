@@ -10,7 +10,7 @@ export default function Home() {
   const [index, setIndex] = useState(0)
   const [gradient, setGradient] = useState(getRandomGradient())
 
-  // Загружаем слова
+  // Загружаем слова 
   useEffect(() => {
     api.get('/words').then((res) => setWords(res.data))
   }, [])
