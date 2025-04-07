@@ -95,4 +95,5 @@ export default function WordListPage() {
       </div>
     </div>
   )
+  
 }
