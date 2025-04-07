@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { ChevronRight, ChevronLeft } from 'lucide-react'
 import { api } from '@/utils/api'
 
@@ -19,6 +20,12 @@ export default function WordListPage() {
   useEffect(() => {
     api.get('/words').then((res) => setWords(res.data))
   }, [])
+  
+  import { useLocation } from 'react-router-dom'
+  const location = useLocation()
+  useEffect(() => {
+    api.get('/words').then((res) => setWords(res.data))
+  }, [location]) // 🔁 теперь обновляется при возврате на страницу
 
   // 🧠 Применение фильтра
   const filteredWords = words.filter((word) => {

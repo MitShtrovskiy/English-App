@@ -18,3 +18,10 @@ class WordOut(WordBase):
 
     class Config:
         orm_mode = True
+
+class WordUpdateFull(BaseModel):
+    word: str
+    translation: str
+    transcription: Optional[str] = ''
+    example: str
+    learned: bool

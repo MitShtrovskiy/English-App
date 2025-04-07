@@ -48,6 +48,19 @@ def delete_word(word_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Word deleted"}
 
+@router.put("/{word_id}", response_model=schemas.WordOut)
+def update_word(word_id: int, update: schemas.WordUpdateFull, db: Session = Depends(get_db)):
+    word = db.query(models.Word).filter(models.Word.id == word_id).first()
+    if not word:
+        raise HTTPException(status_code=404, detail="Word not found")
+        
+    for field, value in update.dict().items():
+        setattr(word, field, value)
+        
+    db.commit()
+    db.refresh(word)
+    return word
+
 # ✅ Загрузить CSV со словами
 @router.post("/upload-csv")
 def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
