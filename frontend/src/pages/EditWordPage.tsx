@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 
 export default function EditWordPage() {
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
   const [word, setWord] = useState({
@@ -25,6 +25,8 @@ export default function EditWordPage() {
       api.get(`/words/${id}`)
         .then((res) => setWord(res.data))
         .catch(() => setError('Не удалось загрузить слово.'))
+    } else {
+      setError('Некорректный ID слова.')
     }
   }, [id])
 
