@@ -22,7 +22,7 @@ export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
       </button>
 
       {/* Заголовок, счётчик и прогресс-бар */}
-      <div className="flex flex-col justify-center items-start gap-1 flex-1 pt-4">
+      <div className="flex flex-col justify-center items-start gap-1 flex-1 pt-2">
         <h1 className="text-white text-[24px] font-light leading-[22px]">
           Изучение слов
         </h1>
