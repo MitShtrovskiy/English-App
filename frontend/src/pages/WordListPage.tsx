@@ -32,7 +32,7 @@ export default function WordListPage() {
       {/* 🔝 Хэдер (фиксирован) */}
       <div className="flex items-start gap-5 px-5 pt-10 pb-4 h-[104px] bg-black sticky top-0 z-10">
         {/* Блок заголовка и счётчика */}
-        <div className="flex flex-col justify-center items-start gap-1 pt-5 flex-1">
+        <div className="flex flex-col justify-center items-start gap-1 pt-2 flex-1">
           <h1 className="text-[24px] font-light leading-[22px]">Мой словарь</h1>
           <p className="text-[14px] font-light leading-[22px] text-white/80">
             У меня {words.length} слов
@@ -42,35 +42,33 @@ export default function WordListPage() {
         {/* 🔙 Кнопка "назад" */}
         <button
           onClick={() => navigate(-1)}
-          className="w-16 h-16 rounded-[20px] bg-white/10 active:bg-white/20 flex justify-center items-center">
+          className="w-16 h-16 rounded-[20px] bg-white/10 active:bg-white/20 flex justify-center items-center"
+        >
           <ChevronRight className="w-6 h-6 text-white/60" />
         </button>
       </div>
-      
-      <div className="flex items-start gap-5 px-5 pt-10 pb-4 sticky top-0 z-10">
-            {/* 🔘 Таб-фильтр */}
-            <div className="flex w-full gap-2 bg-white/5 px-4 py-4 pt-4 pb-4 rounded-[16px]">
-              {[
-                { label: 'Все', value: 'all' },
-                { label: 'В изучении', value: 'unlearned' },
-                { label: 'Выученные', value: 'learned' },
-              ].map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => setFilter(tab.value as typeof filter)}
-                  className={`h-10 px-4 flex-1 flex justify-center items-center text-[16px] font-light leading-[22px] rounded-[12px] ${
-                    filter === tab.value ? 'bg-white/10' : 'bg-transparent'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-        </div>    
-            
-    
+
       {/* 📦 Контент с прокруткой */}
       <div className="flex flex-col gap-5 px-5 pb-8 pt-5 overflow-y-auto">
+        {/* 🔘 Таб-фильтр */}
+        <div className="flex w-full gap-2 bg-white/5 pt-1 px-1 py-1 pb-1 rounded-[16px]">
+          {[
+            { label: 'Все', value: 'all' },
+            { label: 'В изучении', value: 'unlearned' },
+            { label: 'Выученные', value: 'learned' },
+          ].map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setFilter(tab.value as typeof filter)}
+              className={`h-10 px-4 flex-1 flex justify-center items-center text-[16px] font-light leading-[22px] rounded-[12px] ${
+                filter === tab.value ? 'bg-white/10' : 'bg-transparent'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* 📄 Список слов */}
         <div className="flex flex-col pl-2 gap-3">
           {filteredWords.map((word) => (
