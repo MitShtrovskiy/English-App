@@ -9,43 +9,59 @@ import { Button } from '@/components/ui/button'
 export default function EditWordPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+
   const [word, setWord] = useState({
     word: '',
     translation: '',
     transcription: '',
     example: '',
   })
+
   const [error, setError] = useState<string | null>(null)
 
+  // 🔄 Получаем слово по ID при загрузке страницы
   useEffect(() => {
     if (id) {
-      api.get(`/words/${id}`).then((res) => {
-        setWord(res.data)
-      })
+      api.get(`/words/${id}`)
+        .then((res) => setWord(res.data))
+        .catch(() => setError('Не удалось загрузить слово.'))
     }
   }, [id])
 
+  // 📥 Обработка изменения инпутов
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setWord((prev) => ({ ...prev, [name]: value }))
   }
 
+  // ✅ Сохранение изменений
   const handleSubmit = async () => {
     if (!word.word.trim() || !word.translation.trim() || !word.example.trim()) {
       setError('Все поля должны быть заполнены.')
       return
     }
-    await api.put(`/words/${id}`, word)
-    navigate('/word-list')
+
+    try {
+      await api.put(`/words/${id}`, word)
+      navigate('/words') // путь к списку слов
+    } catch {
+      setError('Ошибка при сохранении.')
+    }
   }
 
+  // 🗑 Удаление слова
   const handleDelete = async () => {
-    await api.delete(`/words/${id}`)
-    navigate('/word-list')
+    try {
+      await api.delete(`/words/${id}`)
+      navigate('/words')
+    } catch {
+      setError('Ошибка при удалении.')
+    }
   }
 
   return (
     <div className="max-w-[430px] mx-auto px-4 py-6 space-y-6">
+      {/* 🔙 Верхняя панель с кнопками */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)}>
           ← Назад
@@ -55,6 +71,7 @@ export default function EditWordPage() {
         </Button>
       </div>
 
+      {/* 📝 Форма редактирования */}
       <div className="space-y-4">
         <Input
           name="word"
@@ -82,8 +99,10 @@ export default function EditWordPage() {
         />
       </div>
 
+      {/* ⚠️ Сообщение об ошибке */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
+      {/* 💾 Кнопка сохранить */}
       <Button onClick={handleSubmit} className="w-full mt-4">
         Сохранить
       </Button>
