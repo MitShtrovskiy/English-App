@@ -78,9 +78,9 @@ export default function WordListPage() {
               className="flex h-16 justify-between items-center w-full cursor-pointer hover:bg-white/5 rounded-xl transition"
             >
               {/* 🧾 Левая часть: слово и статус */}
-              <div className="flex flex-col justify-center items-start gap-[2px] px-2 flex-1">
-                <span className="text-[16px] font-light leading-[22px]">{word.word}</span>
-                <span className="text-[14px] font-light leading-[22px] text-white/80">
+              <div className="flex flex-col justify-center items-start gap-[2px] flex-1">
+                <span className="text-[16px] font-light leading-[22px] px-1">{word.word}</span>
+                <span className="text-[14px] font-light leading-[22px] text-white/80 px-1">
                   {word.learned ? 'Выучено' : 'На изучении'}
                 </span>
               </div>
