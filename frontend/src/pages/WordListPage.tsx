@@ -95,7 +95,7 @@ export default function WordListPage() {
                 </span>
               </div>
 
-              {/* ➡️ Иконка справа */}
+              {/* ➡️ Иконка справа  */}
               <div className="w-16 h-16 flex justify-center items-center">
                 <ChevronRight className="w-6 h-6 text-white/60" />
               </div>
