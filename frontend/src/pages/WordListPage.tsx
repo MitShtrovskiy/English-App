@@ -44,14 +44,14 @@ export default function WordListPage() {
           onClick={() => navigate(-1)}
           className="w-16 h-16 rounded-[20px] bg-white/10 active:bg-white/20 flex justify-center items-center"
         >
-          <ChevronLeft className="w-6 h-6 text-white/60" />
+          <ChevronRight className="w-6 h-6 text-white/60" />
         </button>
       </div>
 
       {/* 📦 Контент с прокруткой */}
-      <div className="flex flex-col gap-5 px-5 pb-8 overflow-y-auto">
+      <div className="flex flex-col gap-5 px-5 pb-8 pt-5 overflow-y-auto">
         {/* 🔘 Таб-фильтр */}
-        <div className="flex w-full gap-2">
+        <div className="flex w-full gap-2 bg-white/5 rounded-[16px]">
           {[
             { label: 'Все', value: 'all' },
             { label: 'В изучении', value: 'unlearned' },
