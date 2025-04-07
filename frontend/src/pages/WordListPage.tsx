@@ -32,9 +32,9 @@ export default function WordListPage() {
       {/* 🔝 Хэдер (фиксирован) */}
       <div className="flex items-start gap-5 p-5 w-full bg-black sticky top-0 z-10">
         {/* Блок заголовка и счётчика */}
-        <div className="flex flex-col justify-center items-start gap-1 pt-2 flex-1">
+        <div className="flex flex-col justify-center items-start gap-1 pt-2 px-1 flex-1">
           <h1 className="text-[24px] font-light leading-[22px]">Мой словарь</h1>
-          <p className="text-[14px] font-light leading-[22px] pt-1 text-white/80">
+          <p className="text-[14px] font-light leading-[22px] pt-2 text-white/80">
             У меня {words.length} слов
           </p>
         </div>
@@ -70,7 +70,7 @@ export default function WordListPage() {
         </div>
 
         {/* 📄 Список слов */}
-        <div className="flex flex-col pl-2 pr-2 gap-3">
+        <div className="flex flex-col pl-3 gap-3">
           {filteredWords.map((word) => (
             <div
               key={word.id}
