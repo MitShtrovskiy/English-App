@@ -32,7 +32,7 @@ export default function WordListPage() {
       {/* 🔝 Хэдер (фиксирован) */}
       <div className="flex items-start gap-5 p-5 w-full bg-black sticky top-0 z-10">
         {/* Блок заголовка и счётчика */}
-        <div className="flex flex-col justify-center items-start gap-1 pt-2 px-1 flex-1">
+        <div className="flex flex-col justify-center items-start gap-1 pt-2 px-2 flex-1">
           <h1 className="text-[24px] font-light leading-[22px]">Мой словарь</h1>
           <p className="text-[14px] font-light leading-[22px] pt-2 text-white/80">
             У меня {words.length} слов
@@ -75,12 +75,12 @@ export default function WordListPage() {
             <div
               key={word.id}
               onClick={() => navigate(`/edit-word/${word.id}`)}
-              className="flex h-16 justify-between items-center w-full cursor-pointer hover:bg-white/5 rounded-xl transition"
+              className="flex h-16 justify-between items-center w-full cursor-pointer rounded-xl transition"
             >
               {/* 🧾 Левая часть: слово и статус */}
               <div className="flex flex-col justify-center items-start gap-[2px] flex-1">
-                <span className="text-[16px] font-light leading-[22px] px-1">{word.word}</span>
-                <span className="text-[14px] font-light leading-[22px] text-white/80 px-1">
+                <span className="text-[16px] font-light leading-[22px]">{word.word}</span>
+                <span className="text-[14px] font-light leading-[22px] text-white/80">
                   {word.learned ? 'Выучено' : 'На изучении'}
                 </span>
               </div>
