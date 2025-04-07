@@ -15,7 +15,7 @@ export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
     <div className="flex items-start gap-5 p-5 w-full">
       {/* Кнопка "список слов" */}
       <button
-        onClick={() => navigate('/word-list')}
+        onClick={() => navigate('/words')}
         className="flex w-[64px] h-[64px] flex-col justify-center items-center gap-2 rounded-[20px] bg-white/10"
       >
         <List className="w-6 h-6 text-white/60" />
