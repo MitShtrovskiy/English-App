@@ -27,6 +27,7 @@ export default function WordListPage() {
     api.get('/words').then((res) => setWords(res.data))
   }, [location]) // 🔁 теперь обновляется при возврате на страницу
 
+
   // 🧠 Применение фильтра
   const filteredWords = words.filter((word) => {
     if (filter === 'learned') return word.learned
