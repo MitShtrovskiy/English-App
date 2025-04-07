@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class WordBase(BaseModel):
     word: str
@@ -9,6 +10,14 @@ class WordBase(BaseModel):
 class WordCreate(WordBase):
     pass
 
+    
+class WordUpdateFull(BaseModel):
+    word: str
+    translation: str
+    transcription: Optional[str] = ""
+    example: str
+    learned: bool
+    
 class WordUpdate(BaseModel):
     learned: bool
 
