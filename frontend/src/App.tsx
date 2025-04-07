@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-{/* import Dictionary from './pages/Dictionary' */}
 import WordDetail from './pages/WordDetail'
 import Navbar from './components/Navbar'
 import WordListPage from './pages/WordListPage'
@@ -13,10 +12,7 @@ export default function App() {
       <div className="min-h-screen bg-background pb-20">
         <Routes>
           <Route path="/" element={<Home />} />
-      {/*    <Route path="/dictionary" element={<Dictionary />} /> */}
-      {/*    <Route path="/dictionary/:id" element={<WordDetail />} /> */}
           <Route path="/list" element={<WordListPage />} /> {/* ✅ путь */}
-          <Route path="/edit/:id" element={<EditWordPage />} />
           <Route path="/words/:id/edit" element={<EditWordPage />} />
           <Route path="/words" element={<WordListPage />} />
           <Route path="/upload" element={<UploadPage />} />
