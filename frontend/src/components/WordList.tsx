@@ -1,55 +1,98 @@
 import { useEffect, useState } from 'react'
-import { api } from '@/utils/api'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
+import { ChevronRight, ChevronLeft } from 'lucide-react'
+import { api } from '@/utils/api'
 
-export default function WordList() {
-  const [words, setWords] = useState<any[]>([])
-  const [filter, setFilter] = useState<'all' | 'learned' | 'not-learned'>('all')
+interface Word {
+  id: number
+  word: string
+  translation: string
+  learned: boolean
+}
+
+export default function WordListPage() {
+  const [words, setWords] = useState<Word[]>([])
+  const [filter, setFilter] = useState<'all' | 'learned' | 'unlearned'>('all')
   const navigate = useNavigate()
 
-  const fetchWords = async () => {
-    const res = await api.get('/words')
-    setWords(res.data)
-  }
-
+  // ⏬ Получение слов с бэка
   useEffect(() => {
-    fetchWords()
+    api.get('/words').then((res) => setWords(res.data))
   }, [])
 
+  // 🧠 Применение фильтра
   const filteredWords = words.filter((word) => {
     if (filter === 'learned') return word.learned
-    if (filter === 'not-learned') return !word.learned
+    if (filter === 'unlearned') return !word.learned
     return true
   })
 
   return (
-    <div className="p-4 max-w-lg mx-auto space-y-4">
-      <div className="flex gap-2 justify-center mb-4">
-        <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>
-          Все
-        </Button>
-        <Button variant={filter === 'not-learned' ? 'default' : 'outline'} onClick={() => setFilter('not-learned')}>
-          Не выученные
-        </Button>
-        <Button variant={filter === 'learned' ? 'default' : 'outline'} onClick={() => setFilter('learned')}>
-          Выученные
-        </Button>
+    <div className="min-h-screen bg-black flex flex-col text-white">
+      {/* 🔝 Хэдер (фиксирован) */}
+      <div className="flex items-start gap-5 px-5 pt-10 pb-4 h-[104px] bg-black sticky top-0 z-10">
+        {/* Блок заголовка и счётчика */}
+        <div className="flex flex-col justify-center items-start gap-1 flex-1">
+          <h1 className="text-[24px] font-light leading-[22px]">Мой словарь</h1>
+          <p className="text-[14px] font-light leading-[22px] text-white/80">
+            У меня {words.length} слов
+          </p>
+        </div>
+
+        {/* 🔙 Кнопка "назад" */}
+        <button
+          onClick={() => navigate(-1)}
+          className="w-16 h-16 rounded-[20px] bg-white/10 active:bg-white/20 flex justify-center items-center"
+        >
+          <ChevronLeft className="w-6 h-6 text-white/60" />
+        </button>
       </div>
 
-      {filteredWords.map((word) => (
-        <div
-          key={word.id}
-          className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow cursor-pointer hover:bg-zinc-800 transition"
-          onClick={() => navigate(`/words/${word.id}/edit`)}
-        >
-          <div className="flex justify-between items-center">
-            <span className="font-semibold text-white">{word.word}</span>
-            {word.learned && <span className="text-green-400 text-sm">✓</span>}
-          </div>
-          <p className="text-muted-foreground text-sm">{word.translation}</p>
+      {/* 📦 Контент с прокруткой */}
+      <div className="flex flex-col gap-5 px-5 pb-8 overflow-y-auto">
+        {/* 🔘 Таб-фильтр */}
+        <div className="flex w-full gap-2">
+          {[
+            { label: 'Все', value: 'all' },
+            { label: 'В изучении', value: 'unlearned' },
+            { label: 'Выученные', value: 'learned' },
+          ].map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setFilter(tab.value as typeof filter)}
+              className={`h-10 px-4 flex-1 flex justify-center items-center text-[16px] font-light leading-[22px] rounded-[12px] ${
+                filter === tab.value ? 'bg-white/10' : 'bg-transparent'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-      ))}
+
+        {/* 📄 Список слов */}
+        <div className="flex flex-col pl-2 gap-3">
+          {filteredWords.map((word) => (
+            <div
+              key={word.id}
+              onClick={() => navigate(`/edit-word/${word.id}`)}
+              className="flex h-16 justify-between items-center w-full cursor-pointer hover:bg-white/5 rounded-xl transition"
+            >
+              {/* 🧾 Левая часть: слово и статус */}
+              <div className="flex flex-col justify-center items-start gap-[2px] flex-1">
+                <span className="text-[16px] font-light leading-[22px]">{word.word}</span>
+                <span className="text-[14px] font-light leading-[22px] text-white/80">
+                  {word.learned ? 'Выучено' : 'На изучении'}
+                </span>
+              </div>
+
+              {/* ➡️ Иконка справа */}
+              <div className="w-16 h-16 flex justify-center items-center">
+                <ChevronRight className="w-6 h-6 text-white/60" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
