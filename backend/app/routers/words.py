@@ -16,7 +16,7 @@ def get_db():
         db.close()
 
 # ✅ Получить все слова
-@router.get("/", response_model=list[schemas.WordOut])
+@router.get("", response_model=list[schemas.WordOut]) # ⬅️ убрали слэш
 def get_words(db: Session = Depends(get_db)):
     return db.query(models.Word).all()
 
