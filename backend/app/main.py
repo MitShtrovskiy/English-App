@@ -4,47 +4,39 @@ from app.routers import words  # Роутер с эндпоинтами /words
 from app.database import SessionLocal
 from app import models
 
-from fastapi.middleware.cors import CORSMiddleware
-
 app = FastAPI()
 
-# Добавим CORS и заголовки
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.middleware("http")
-async def add_charset_header(request, call_next):
-    response = await call_next(request)
-    response.headers["Content-Type"] = "application/json; charset=utf-8"
-    return response
-
-# CORS: разрешаем фронту обращаться к API
+# ✅ Разрешаем доступ фронтенду
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "https://english-app-nine.vercel.app"  # ← сюда вставь свой домен с Vercel
+        "http://localhost:5173",  # локальная разработка
+        "https://english-app-nine.vercel.app",  # твой Vercel домен
+        "https://english-app-git-main-mitshtrovskiy-projects.vercel.app"  # fallback домен для других deploy preview
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Подключаем роутер
+# ✅ Добавляем заголовок с кодировкой
+@app.middleware("http")
+async def add_charset_header(request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    return response
+
+# ✅ Подключаем роуты
 app.include_router(words.router)
 
 
-# === Тестовые данные ===
+# === 📦 Демо-слова при запуске сервера ===
 def seed_words():
     db = SessionLocal()
 
     if db.query(models.Word).first():
         db.close()
-        return  # уже есть данные
+        return  # если уже есть слова — не заполняем
 
     sample_words = [
         {
@@ -84,7 +76,7 @@ def seed_words():
     db.close()
 
 
-# Выполняем при запуске сервера
+# ✅ Выполняем при запуске сервера
 @app.on_event("startup")
 def on_startup():
     seed_words()
