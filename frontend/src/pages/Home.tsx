@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar'
 import { AnimatePresence } from 'framer-motion'
 import { getRandomGradient } from '../utils/gradients'
 
+
 export default function Home() {
   const [words, setWords] = useState<any[]>([])
   const [index, setIndex] = useState(0)
