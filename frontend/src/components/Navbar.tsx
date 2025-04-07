@@ -26,7 +26,7 @@ export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
         <h1 className="text-white text-[24px] font-light leading-[22px]">
           Изучение слов
         </h1>
-        <p className="text-white/80 text-[14px] font-thin leading-[22px]">
+        <p className="text-white/80 text-[14px] font-thin leading-[22px] pt-2">
           выучено {learnedCount}/{totalCount}
         </p>
       </div>
