@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 
 export default function EditWordPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
-  const isNew = !id || id === 'new'
+
+  const isNew = id === 'new' || !id
 
   const [word, setWord] = useState({
     word: '',
@@ -21,29 +22,27 @@ export default function EditWordPage() {
 
   const [error, setError] = useState<string | null>(null)
 
-  // 🔁 Загрузка слова по ID (если редактируем)
   useEffect(() => {
     if (!id || isNew) return
     api
       .get(`/words/${id}`)
       .then((res) => setWord(res.data))
       .catch(() => setError('Не удалось загрузить слово.'))
-  }, [id])
+  }, [id, isNew])
 
-  // 📝 Обработка полей ввода
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setWord((prev) => ({ ...prev, [name]: value }))
   }
 
-  // ✅ Обработка переключателя "Выучено"
   const toggleLearned = (value: boolean) => {
     setWord((prev) => ({ ...prev, learned: value }))
   }
 
-  // 💾 Сохранение
   const handleSubmit = async () => {
-    if (!word.word.trim() || !word.translation?.trim()) {
+    setError(null)
+
+    if (!word.word.trim() || !word.translation.trim()) {
       setError('Слово и перевод обязательны.')
       return
     }
@@ -51,20 +50,22 @@ export default function EditWordPage() {
     try {
       if (isNew) {
         await api.post('/words', word)
-      } else {
+      } else if (id) {
         await api.put(`/words/${Number(id)}`, word)
       }
       navigate('/words')
     } catch (e: any) {
+      console.error('Ошибка сохранения:', e)
       setError('Ошибка при сохранении.')
     }
   }
 
-  // 🗑 Удаление слова
   const handleDelete = async () => {
     try {
-      await api.delete(`/words/${Number(id)}`)
-      navigate('/words')
+      if (id) {
+        await api.delete(`/words/${Number(id)}`)
+        navigate('/words')
+      }
     } catch {
       setError('Ошибка при удалении.')
     }
@@ -72,7 +73,6 @@ export default function EditWordPage() {
 
   return (
     <div className="max-w-[430px] mx-auto px-4 py-6 space-y-6">
-      {/* 🔙 Навигация */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)}>
           ← Назад
@@ -84,14 +84,8 @@ export default function EditWordPage() {
         )}
       </div>
 
-      {/* 📝 Форма */}
       <div className="space-y-4">
-        <Input
-          name="word"
-          placeholder="Слово"
-          value={word.word}
-          onChange={handleChange}
-        />
+        <Input name="word" placeholder="Слово" value={word.word} onChange={handleChange} />
         <Input
           name="translation"
           placeholder="Перевод"
@@ -110,15 +104,12 @@ export default function EditWordPage() {
           value={word.example}
           onChange={handleChange}
         />
-
-        {/* ✅ Переключатель "Выучено" */}
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm text-white/80">Выучено</span>
           <Switch checked={word.learned} onCheckedChange={toggleLearned} />
         </div>
       </div>
 
-      {/* ⚠️ Ошибка */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <Button onClick={handleSubmit} className="w-full mt-4">
