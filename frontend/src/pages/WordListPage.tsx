@@ -45,7 +45,7 @@ export default function WordListPage() {
           </p>
         </div>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="w-16 h-16 rounded-[20px] bg-white/10 active:bg-white/20 flex justify-center items-center"
         >
           <ChevronRight className="w-6 h-6 text-white/60" />
