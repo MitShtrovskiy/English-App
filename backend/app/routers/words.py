@@ -16,7 +16,7 @@ def get_db():
         db.close()
 
 # ✅ Получить все слова
-@router.get("", response_model=list[schemas.WordOut]) # ⬅️ убрали слэш
+@router.get("/", response_model=list[schemas.WordOut]) # ⬅️ убрали слэш
 def get_words(db: Session = Depends(get_db)):
     return db.query(models.Word).all()
 
@@ -51,6 +51,9 @@ def delete_word(word_id: int, db: Session = Depends(get_db)):
 # ✅ Добавить новое слово
 @router.post("/", response_model=schemas.WordOut)
 def create_word(word: schemas.WordCreate, db: Session = Depends(get_db)):
+    existing = db.query(models.Word).filter(models.Word.word == word.word).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Такое слово уже есть.")
     new_word = models.Word(**word.dict())
     db.add(new_word)
     db.commit()
