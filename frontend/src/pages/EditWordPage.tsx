@@ -21,6 +21,10 @@ export default function EditWordPage() {
   const isNew = !id || id === 'new'
   const numericId = !isNew && id ? Number(id) : null
 
+  console.log('🧠 useParams id:', id)
+  console.log('🟢 isNew:', isNew)
+  console.log('🔢 numericId:', numericId)
+
   const [word, setWord] = useState<WordFormData>({
     word: '',
     translation: '',
@@ -32,7 +36,6 @@ export default function EditWordPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  // 🔁 Загрузка существующего слова
   useEffect(() => {
     if (!numericId) return
 
@@ -44,7 +47,6 @@ export default function EditWordPage() {
       .finally(() => setLoading(false))
   }, [numericId])
 
-  // 📥 Обработка изменений полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setWord((prev) => ({ ...prev, [name]: value }))
@@ -54,11 +56,10 @@ export default function EditWordPage() {
     setWord((prev) => ({ ...prev, learned: value }))
   }
 
-  // 💾 Сохранение
   const handleSubmit = async () => {
     setError(null)
+    console.log('📤 handleSubmit → isNew:', isNew, 'id:', id, 'numericId:', numericId)
 
-    // 🔎 Валидация
     if (!word.word.trim()) {
       setError('Поле "Слово" обязательно.')
       return
@@ -87,7 +88,6 @@ export default function EditWordPage() {
     }
   }
 
-  // 🗑 Удаление
   const handleDelete = async () => {
     if (!numericId) {
       setError('Некорректный ID для удаления.')
@@ -106,7 +106,6 @@ export default function EditWordPage() {
 
   return (
     <div className="max-w-[430px] mx-auto px-4 py-6 space-y-6">
-      {/* 🔙 Навигация */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)}>
           ← Назад
@@ -118,43 +117,18 @@ export default function EditWordPage() {
         )}
       </div>
 
-      {/* 📝 Форма */}
       <div className="space-y-4">
-        <Input
-          name="word"
-          placeholder="Слово"
-          value={word.word}
-          onChange={handleChange}
-        />
-        <Input
-          name="translation"
-          placeholder="Перевод"
-          value={word.translation}
-          onChange={handleChange}
-        />
-        <Input
-          name="transcription"
-          placeholder="Транскрипция"
-          value={word.transcription}
-          onChange={handleChange}
-        />
-        <Textarea
-          name="example"
-          placeholder="Пример использования"
-          value={word.example}
-          onChange={handleChange}
-        />
-
+        <Input name="word" placeholder="Слово" value={word.word} onChange={handleChange} />
+        <Input name="translation" placeholder="Перевод" value={word.translation} onChange={handleChange} />
+        <Input name="transcription" placeholder="Транскрипция" value={word.transcription} onChange={handleChange} />
+        <Textarea name="example" placeholder="Пример использования" value={word.example} onChange={handleChange} />
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm text-white/80">Выучено</span>
           <Switch checked={word.learned} onCheckedChange={toggleLearned} />
         </div>
       </div>
 
-      {/* ⚠️ Ошибка */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
-
-      {/* 🕓 Загрузка */}
       {loading && <p className="text-white/70 text-sm">Загрузка слова...</p>}
 
       <Button onClick={handleSubmit} className="w-full mt-4">
