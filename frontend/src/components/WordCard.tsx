@@ -46,7 +46,7 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
                 ) : (
                   <span className="relative inline-block">
                     <span className="opacity-0">{matches[i]}</span>
-                    <span className="absolute inset-0 -m-1 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-[4px]" />
+                    <span className="absolute inset-0 -m-1 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-[2px]" />
                   </span>
                 )}
               </span>
