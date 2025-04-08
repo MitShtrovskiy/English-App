@@ -48,6 +48,15 @@ def delete_word(word_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Word deleted"}
 
+# ✅ Добавить новое слово
+@router.post("/", response_model=schemas.WordOut)
+def create_word(word: schemas.WordCreate, db: Session = Depends(get_db)):
+    new_word = models.Word(**word.dict())
+    db.add(new_word)
+    db.commit()
+    db.refresh(new_word)
+    return new_word
+
 @router.put("/{word_id}", response_model=schemas.WordOut)
 def update_word(word_id: int, update: schemas.WordUpdateFull, db: Session = Depends(get_db)):
     word = db.query(models.Word).filter(models.Word.id == word_id).first()
