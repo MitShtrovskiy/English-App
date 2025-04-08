@@ -1,14 +1,23 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class WordBase(BaseModel):
     word: str
-    transcription: str
-    translation: str
-    example: str
+    transcription: Optional[str] = None
+    translation: Optional[str] = None
+    example: Optional[str] = None
 
 class WordCreate(WordBase):
-    pass
+    learned: bool = False  # ⬅️ обязательно, иначе FastAPI даст 422
 
+    
+class WordUpdateFull(BaseModel):
+    word: str
+    translation: str
+    transcription: Optional[str] = ""
+    example: str
+    learned: bool
+    
 class WordUpdate(BaseModel):
     learned: bool
 
@@ -16,12 +25,6 @@ class WordOut(WordBase):
     id: int
     learned: bool
 
-    class Config:
-        orm_mode = True
-
-class WordUpdateFull(BaseModel):
-    word: str
-    translation: str
-    transcription: Optional[str] = ''
-    example: str
-    learned: bool
+    model_config = {
+        "from_attributes": True
+    }
