@@ -103,6 +103,17 @@ export default function WordListPage() {
           ))}
         </div>
       </div>
+      
+      {/* ➕ Кнопка добавления слова */}
+      <div className="sticky bottom-0 bg-black w-full px-5 pb-6 pt-3">
+        <button
+          onClick={() => navigate('/upload')}
+          className="w-full h-14 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
+        >
+          Добавить слово
+        </button>
+      </div>
+      
     </div>
   )
 }
