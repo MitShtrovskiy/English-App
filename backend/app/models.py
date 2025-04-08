@@ -6,7 +6,7 @@ class Word(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     word = Column(String, nullable=False)
-    transcription = Column(String)
-    translation = Column(String, nullable=False)
-    example = Column(String)
+    transcription = Column(String, nullable=True)
+    translation = Column(String, nullable=True)
+    example = Column(String, nullable=True)
     learned = Column(Boolean, default=False)

@@ -3,9 +3,9 @@ from typing import Optional
 
 class WordBase(BaseModel):
     word: str
-    transcription: Optional[str] = ""
-    translation: Optional[str] = ""
-    example: Optional[str] = ""
+    transcription: Optional[str] = None
+    translation: Optional[str] = None
+    example: Optional[str] = None
 
 class WordCreate(WordBase):
     learned: bool = False  # ⬅️ обязательно, иначе FastAPI даст 422
