@@ -6,13 +6,22 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 
+interface WordFormData {
+  word: string
+  translation: string
+  transcription: string
+  example: string
+  learned: boolean
+}
+
 export default function EditWordPage() {
   const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
 
-  const isNew = id === 'new' || !id
+  const isNew = !id || id === 'new'
+  const numericId = !isNew && id ? Number(id) : null
 
-  const [word, setWord] = useState({
+  const [word, setWord] = useState<WordFormData>({
     word: '',
     translation: '',
     transcription: '',
@@ -21,15 +30,21 @@ export default function EditWordPage() {
   })
 
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
+  // 🔁 Загрузка существующего слова
   useEffect(() => {
-    if (!id || isNew) return
+    if (!numericId) return
+
+    setLoading(true)
     api
-      .get(`/words/${id}`)
+      .get(`/words/${numericId}`)
       .then((res) => setWord(res.data))
       .catch(() => setError('Не удалось загрузить слово.'))
-  }, [id, isNew])
+      .finally(() => setLoading(false))
+  }, [numericId])
 
+  // 📥 Обработка изменений полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setWord((prev) => ({ ...prev, [name]: value }))
@@ -39,40 +54,59 @@ export default function EditWordPage() {
     setWord((prev) => ({ ...prev, learned: value }))
   }
 
+  // 💾 Сохранение
   const handleSubmit = async () => {
     setError(null)
 
-    if (!word.word.trim() || !word.translation.trim()) {
-      setError('Слово и перевод обязательны.')
+    // 🔎 Валидация
+    if (!word.word.trim()) {
+      setError('Поле "Слово" обязательно.')
+      return
+    }
+    if (!word.translation.trim()) {
+      setError('Поле "Перевод" обязательно.')
       return
     }
 
     try {
       if (isNew) {
+        console.log('📦 POST /words', word)
         await api.post('/words', word)
-      } else if (id) {
-        await api.put(`/words/${Number(id)}`, word)
+      } else if (numericId) {
+        console.log(`🛠 PUT /words/${numericId}`, word)
+        await api.put(`/words/${numericId}`, word)
+      } else {
+        setError('Некорректный ID.')
+        return
       }
+
       navigate('/words')
-    } catch (e: any) {
-      console.error('Ошибка сохранения:', e)
-      setError('Ошибка при сохранении.')
+    } catch (err) {
+      console.error('❌ Ошибка при сохранении:', err)
+      setError('Ошибка при сохранении. Попробуйте позже.')
     }
   }
 
+  // 🗑 Удаление
   const handleDelete = async () => {
+    if (!numericId) {
+      setError('Некорректный ID для удаления.')
+      return
+    }
+
     try {
-      if (id) {
-        await api.delete(`/words/${Number(id)}`)
-        navigate('/words')
-      }
-    } catch {
-      setError('Ошибка при удалении.')
+      console.log(`🗑 DELETE /words/${numericId}`)
+      await api.delete(`/words/${numericId}`)
+      navigate('/words')
+    } catch (err) {
+      console.error('❌ Ошибка при удалении:', err)
+      setError('Ошибка при удалении. Попробуйте позже.')
     }
   }
 
   return (
     <div className="max-w-[430px] mx-auto px-4 py-6 space-y-6">
+      {/* 🔙 Навигация */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)}>
           ← Назад
@@ -84,8 +118,14 @@ export default function EditWordPage() {
         )}
       </div>
 
+      {/* 📝 Форма */}
       <div className="space-y-4">
-        <Input name="word" placeholder="Слово" value={word.word} onChange={handleChange} />
+        <Input
+          name="word"
+          placeholder="Слово"
+          value={word.word}
+          onChange={handleChange}
+        />
         <Input
           name="translation"
           placeholder="Перевод"
@@ -104,13 +144,18 @@ export default function EditWordPage() {
           value={word.example}
           onChange={handleChange}
         />
+
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm text-white/80">Выучено</span>
           <Switch checked={word.learned} onCheckedChange={toggleLearned} />
         </div>
       </div>
 
+      {/* ⚠️ Ошибка */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {/* 🕓 Загрузка */}
+      {loading && <p className="text-white/70 text-sm">Загрузка слова...</p>}
 
       <Button onClick={handleSubmit} className="w-full mt-4">
         Сохранить
