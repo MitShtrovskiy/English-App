@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch'
 export default function EditWordPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const isNew = id === 'new'
+  const isNew = !id || id === 'new'
 
   const [word, setWord] = useState({
     word: '',
