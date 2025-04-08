@@ -3,12 +3,12 @@ from typing import Optional
 
 class WordBase(BaseModel):
     word: str
-    transcription: str
-    translation: str
-    example: str
+    transcription: Optional[str] = ""
+    translation: Optional[str] = ""
+    example: Optional[str] = ""
 
 class WordCreate(WordBase):
-    pass
+    learned: bool = False  # ⬅️ обязательно, иначе FastAPI даст 422
 
     
 class WordUpdateFull(BaseModel):
