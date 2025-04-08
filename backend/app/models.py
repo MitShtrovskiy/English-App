@@ -10,3 +10,4 @@ class Word(Base):
     translation = Column(String, nullable=True)
     example = Column(String, nullable=True)
     learned = Column(Boolean, default=False)
+    
