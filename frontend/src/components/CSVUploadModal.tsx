@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import Papa from 'papaparse'
 import { api } from '@/utils/api'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { X } from 'lucide-react'
 
 interface CSVUploadModalProps {
   open: boolean
@@ -13,6 +13,8 @@ export default function CSVUploadModal({ open, onClose }: CSVUploadModalProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [status, setStatus] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+
+  if (!open) return null // 🧼 Модалка отображается только если open=true
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -56,40 +58,54 @@ export default function CSVUploadModal({ open, onClose }: CSVUploadModalProps) {
     })
   }
 
-  const handleClose = () => {
+  const closeAndReset = () => {
     setStatus(null)
     setIsUploading(false)
     onClose()
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Импорт CSV</DialogTitle>
-          <DialogDescription>Добавьте слова из CSV-файла. Поддерживается UTF-8 с BOM.</DialogDescription>
-        </DialogHeader>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-[#1A1A1A] w-full max-w-md rounded-[20px] p-6 relative shadow-lg text-white">
+        {/* Закрытие */}
+        <button
+          onClick={closeAndReset}
+          className="absolute top-4 right-4 text-white/70 hover:text-white"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
-        <div className="space-y-4">
-          <input
-            type="file"
-            accept=".csv"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={handleFileChange}
-          />
+        {/* Заголовок */}
+        <h2 className="text-xl font-medium mb-1">Импорт CSV</h2>
+        <p className="text-sm text-white/60 mb-5">
+          Добавьте слова из CSV-файла. Поддерживается UTF-8 с BOM.
+        </p>
 
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="w-full"
-          >
-            Выбрать CSV-файл
-          </Button>
+        {/* Скрытое поле выбора */}
+        <input
+          type="file"
+          accept=".csv"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileChange}
+        />
 
-          {status && <p className="text-sm text-white/70">{status}</p>}
-        </div>
-      </DialogContent>
-    </Dialog>
+        {/* Кнопка выбора файла */}
+        <Button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="w-full"
+        >
+          Выбрать CSV-файл
+        </Button>
+
+        {/* Статус */}
+        {status && (
+          <p className="mt-4 text-sm text-white/80 whitespace-pre-wrap">
+            {status}
+          </p>
+        )}
+      </div>
+    </div>
   )
 }
