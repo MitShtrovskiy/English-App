@@ -20,16 +20,14 @@ export default function EditWordPage() {
 
   const [error, setError] = useState<string | null>(null)
 
-  // 🔄 Получаем слово по ID
-  useEffect(() => {
-    if (id) {
-      api.get(`/words/${id}`)
-        .then((res) => setWord(res.data))
-        .catch(() => setError('Не удалось загрузить слово.'))
-    } else {
-      setError('Некорректный ID слова.')
-    }
-  }, [id])
+      // 🔁 Загрузка слова (или пропуск, если 'new')
+      useEffect(() => {
+        if (!id || id === 'new') return // ✅ Пропускаем загрузку, если создаём новое слово
+        
+        api.get(`/words/${id}`)
+          .then((res) => setWord(res.data))
+          .catch(() => setError('Не удалось загрузить слово.'))
+      }, [id])
 
   // 📥 Обработка изменения текстовых полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -50,8 +48,13 @@ export default function EditWordPage() {
     }
 
     try {
-      await api.put(`/words/${id}`, word)
-      navigate('/words')
+      if (id === 'new') {
+        await api.post('/words', word) // ✅ Создание нового слова
+      } else {
+        await api.put(`/words/${id}`, word) // ✅ Обновление
+      }
+      
+      navigate('/words') // ✅ Переход к списку
     } catch {
       setError('Ошибка при сохранении.')
     }
