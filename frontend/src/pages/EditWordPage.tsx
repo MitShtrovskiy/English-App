@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch' // Добавим Switch
 export default function EditWordPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const isNew = id === 'new' // ✅ новый режим
 
   const [word, setWord] = useState({
     word: '',
@@ -22,7 +23,7 @@ export default function EditWordPage() {
 
       // 🔁 Загрузка слова (или пропуск, если 'new')
       useEffect(() => {
-        if (!id || id === 'new') return // ✅ Пропускаем загрузку, если создаём новое слово
+        if (!id || isNew) return // ✅ Пропускаем загрузку, если создаём новое слово
         
         api.get(`/words/${id}`)
           .then((res) => setWord(res.data))
@@ -48,10 +49,11 @@ export default function EditWordPage() {
     }
 
     try {
-      if (id === 'new') {
+      if (isNew) {
         await api.post('/words', word) // ✅ Создание нового слова
+        
       } else {
-        await api.put(`/words/${id}`, word) // ✅ Обновление
+        await api.put(`/words/${id}`, word)// ✅ Обновление
       }
       
       navigate('/words') // ✅ Переход к списку
