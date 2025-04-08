@@ -52,7 +52,7 @@ export default function EditWordPage() {
       if (isNew) {
         await api.post('/words', word)
       } else {
-        await api.put(`/words/${id}`, word)
+        await api.put(`/words/${Number(id)}`, word)
       }
       navigate('/words')
     } catch (e: any) {
@@ -63,7 +63,7 @@ export default function EditWordPage() {
   // 🗑 Удаление слова
   const handleDelete = async () => {
     try {
-      await api.delete(`/words/${id}`)
+      await api.delete(`/words/${Number(id)}`)
       navigate('/words')
     } catch {
       setError('Ошибка при удалении.')
