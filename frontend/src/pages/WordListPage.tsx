@@ -83,7 +83,7 @@ export default function WordListPage() {
           {filteredWords.map((word) => (
             <div
               key={word.id}
-              onClick={() => navigate(`/words/${word.id}/edit`)}
+              onClick={() => word?.id && navigate(`/words/${word.id}/edit`)}
 
               className="flex h-16 justify-between items-center w-full cursor-pointer rounded-xl transition"
             >
