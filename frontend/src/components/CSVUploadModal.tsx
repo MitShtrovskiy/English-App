@@ -1,66 +1,95 @@
 import { useRef, useState } from 'react'
-import { api } from '../utils/api'
 import Papa from 'papaparse'
+import { api } from '@/utils/api'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
-export default function CSVUploadModal() {
-  const [fileName, setFileName] = useState('')
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [loading, setLoading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+interface CSVUploadModalProps {
+  open: boolean
+  onClose: () => void
+}
 
-  const requiredHeaders = ['word', 'transcription', 'translation', 'example', 'learned']
+export default function CSVUploadModal({ open, onClose }: CSVUploadModalProps) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [status, setStatus] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setError('')
-    setSuccess('')
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setFileName(file.name)
+    setIsUploading(true)
+    setStatus('⏳ Обрабатываем CSV...')
 
     Papa.parse(file, {
       header: true,
+      skipEmptyLines: true,
       complete: async (results) => {
-        const headers = results.meta.fields || []
-        const isValid = requiredHeaders.every((h) => headers.includes(h))
+        const rows = results.data as any[]
+        const validWords = rows.filter(row => row.word && row.translation)
 
-        if (!isValid) {
-          setError('Некорректная структура CSV. Требуемые поля: ' + requiredHeaders.join(', '))
-          return
-        }
+        setStatus(`📤 Загружаем ${validWords.length} слов...`)
 
         try {
-          setLoading(true)
-          const formData = new FormData()
-          formData.append('file', file)
-          await api.post('/words/upload-csv-test', formData)
-          setSuccess('Файл успешно загружен!')
+          for (const word of validWords) {
+            await api.post('/words', {
+              word: word.word,
+              translation: word.translation,
+              transcription: word.transcription || '',
+              example: word.example || '',
+              learned: String(word.learned).toLowerCase() === 'true',
+            })
+          }
+          setStatus(`✅ Успешно загружено ${validWords.length} слов`)
         } catch (err) {
-          setError('Ошибка при загрузке файла.')
+          console.error('❌ Ошибка загрузки:', err)
+          setStatus('❌ Ошибка при загрузке')
         } finally {
-          setLoading(false)
+          setIsUploading(false)
         }
+      },
+      error: (error) => {
+        console.error('❌ Ошибка разбора CSV:', error)
+        setStatus('❌ Ошибка при чтении файла')
+        setIsUploading(false)
       },
     })
   }
 
+  const handleClose = () => {
+    setStatus(null)
+    setIsUploading(false)
+    onClose()
+  }
+
   return (
-    <div className="p-4 space-y-4 max-w-[430px] mx-auto">
-      <h1 className="text-xl font-bold">Загрузка CSV</h1>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Импорт CSV</DialogTitle>
+          <DialogDescription>Добавьте слова из CSV-файла. Поддерживается UTF-8 с BOM.</DialogDescription>
+        </DialogHeader>
 
-      <input
-        type="file"
-        accept=".csv"
-        ref={fileInputRef}
-        onChange={handleFile}
-        className="w-full text-sm text-white bg-surface p-2 rounded-xl border border-muted"
-      />
+        <div className="space-y-4">
+          <input
+            type="file"
+            accept=".csv"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleFileChange}
+          />
 
-      {fileName && <p className="text-sm text-muted">Файл: {fileName}</p>}
-      {loading && <p className="text-sm text-primary">Загрузка...</p>}
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      {success && <p className="text-sm text-green-500">{success}</p>}
-    </div>
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="w-full"
+          >
+            Выбрать CSV-файл
+          </Button>
+
+          {status && <p className="text-sm text-white/70">{status}</p>}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
