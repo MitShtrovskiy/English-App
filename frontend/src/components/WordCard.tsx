@@ -79,13 +79,13 @@ export default function WordCard({ word, gradient, onMarkAsLearned }: WordCardPr
       {/* 📘 Перевод и пример */}
       <div className="flex flex-col gap-5 px-5 py-5 flex-1 w-full">
         {/* Перевод */}
-        <div className="relative inline-block" style={{ height: '40px' }}>
+        <div className="relative inline-block pt-2 pb-2" style={{ height: '40px' }}>
           {isTranslationHidden ? (
             <span className="relative inline-block">
               <span className="opacity-0 text-[24px] font-medium leading-[22px] text-white">
                 {translationText}
               </span>
-              <span className="absolute inset-0 -m-1 rounded-[8px]  pt-1 pb-1 border border-white/5 bg-white/10 backdrop-blur-[2px]" />
+              <span className="absolute inset-0 -m-1 rounded-[8px] border border-white/5 bg-white/10 backdrop-blur-[2px]" />
             </span>
           ) : (
             <p className="text-white text-[24px] font-medium leading-[22px]">{translationText}</p>
