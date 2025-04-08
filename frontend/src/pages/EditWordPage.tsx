@@ -19,6 +19,7 @@ export default function EditWordPage() {
     learned: false,
   })
 
+
   const [error, setError] = useState<string | null>(null)
 
       // 🔁 Загрузка слова (или пропуск, если 'new')
