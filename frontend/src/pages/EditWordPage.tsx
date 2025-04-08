@@ -83,9 +83,9 @@ export default function EditWordPage() {
       {/* 📝 Форма */}
       <div className="space-y-4">
         <Input name="word" placeholder="Слово" value={word.word} onChange={handleChange} />
-        <Input name="translation" placeholder="Перевод" value={word.translation} onChange={handleChange} />
-        <Input name="transcription" placeholder="Транскрипция" value={word.transcription} onChange={handleChange} />
-        <Textarea name="example" placeholder="Пример использования" value={word.example} onChange={handleChange} />
+        <Input name="translation" placeholder="Перевод" value={word.translation || ''} onChange={handleChange} />
+        <Input name="transcription" placeholder="Транскрипция" value={word.transcription || ''} onChange={handleChange} />
+        <Textarea name="example" placeholder="Пример использования" value={word.example || ''} onChange={handleChange} />
 
         {/* ✅ Переключатель "Выучено" */}
         <div className="flex items-center justify-between pt-2">
