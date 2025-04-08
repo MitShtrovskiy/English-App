@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 import csv, codecs
 from database import SessionLocal, engine
-from app import schemas
+from app import models, schemas
 
 models.Base.metadata.create_all(bind=engine)
 
