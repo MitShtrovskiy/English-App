@@ -99,4 +99,5 @@ export default function EditWordPage() {
       <Button onClick={handleSubmit} className="w-full mt-4">Сохранить</Button>
     </div>
   )
+  
 }
