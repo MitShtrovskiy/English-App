@@ -14,6 +14,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/list" element={<WordListPage />} /> {/* ✅ путь */}
           <Route path="/words/:id/edit" element={<EditWordPage />} />
+          <Route path="/edit/new" element={<EditWordPage />} /> 
           <Route path="/words" element={<WordListPage />} />
           <Route path="/upload" element={<UploadPage />} />
         </Routes>
