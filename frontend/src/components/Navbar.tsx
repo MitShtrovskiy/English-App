@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { List, Download } from 'lucide-react'
-import CSVUploadModal from '@/components/CSVUploadModal'
+import { List, User } from 'lucide-react' // 🔄 Заменили Download на User
 
 interface NavbarProps {
   totalCount: number
@@ -10,7 +9,6 @@ interface NavbarProps {
 
 export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
   const navigate = useNavigate()
-  const [modalOpen, setModalOpen] = useState(false)
 
   const progress = totalCount === 0 ? 0 : (learnedCount / totalCount) * 100
 
@@ -35,17 +33,14 @@ export default function Navbar({ totalCount, learnedCount }: NavbarProps) {
           </p>
         </div>
 
-        {/* Кнопка "загрузить слово" — теперь открывает модалку */}
+        {/* Кнопка "профиль" */}
         <button
-          onClick={() => setModalOpen(true)}
+          onClick={() => navigate('/profile')} // 🔑 переход на страницу профиля
           className="flex w-[64px] h-[64px] flex-col justify-center items-center gap-2 rounded-[20px] bg-white/10"
         >
-          <Download className="w-6 h-6 text-white/60" />
+          <User className="w-6 h-6 text-white/60" />
         </button>
       </div>
-
-      {/* 📦 Модалка загрузки CSV */}
-      <CSVUploadModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   )
 }

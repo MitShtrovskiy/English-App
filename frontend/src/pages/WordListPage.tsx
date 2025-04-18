@@ -64,7 +64,7 @@ export default function WordListPage() {
   const trailingActions = (id: number) => (
     <TrailingActions>
       <SwipeAction destructive onClick={() => handleDeleteWord(id)}>
-        <div className="bg-red-600 text-white px-4 py-4 rounded-l-lg text-m">Удалить</div>
+        <div className="bg-red-600 text-white px-4 py-5 rounded-l-lg text-m">Удалить</div>
       </SwipeAction>
     </TrailingActions>
   )

@@ -4,6 +4,9 @@ import Navbar from './components/Navbar'
 import WordListPage from './pages/WordListPage'
 import EditWordPage from './pages/EditWordPage'
 import UploadPage from './pages/UploadPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import ProfilePage from './pages/ProfilePage'
 
 export default function App() {
   return (
@@ -16,6 +19,9 @@ export default function App() {
           <Route path="/words/:id/edit" element={<EditWordPage />} />
           <Route path="/words" element={<WordListPage />} />
           <Route path="/upload" element={<UploadPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </div>
     </Router>
