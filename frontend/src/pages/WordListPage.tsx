@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Download } from 'lucide-react'
 import { api } from '@/utils/api'
+import CSVUploadModal from '@/components/CSVUploadModal'
 
 interface Word {
   id: number
@@ -14,6 +15,7 @@ export default function WordListPage() {
   const [words, setWords] = useState<Word[]>([])
   const [filter, setFilter] = useState<'all' | 'learned' | 'unlearned'>('all')
   const [error, setError] = useState<string | null>(null)
+  const [modalOpen, setModalOpen] = useState(false) 
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -102,15 +104,27 @@ export default function WordListPage() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 bg-black w-full px-5 pb-6 pt-3">
-        <button
-          onClick={() => navigate('/edit/new')}
-          className="w-full h-14 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
-        >
-          Добавить слово
-        </button>
-      
-      </div>
-    </div>
-  )
+      <div className="sticky bottom-0 bg-black w-full px-5 pb-6 pt-3 flex gap-2">
+              {/* Кнопка загрузки CSV */}
+              <button
+                onClick={() => setModalOpen(true)}                                           // ← открываем модалку
+                className="w-1/3 h-14 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
+              >
+                <Download className="w-5 h-5" />                                            // ← иконка загрузки
+                Загрузить слова
+              </button>
+    
+              {/* Кнопка добавления нового слова */}
+              <button
+                onClick={() => navigate('/edit/new')}
+                className="flex-1 h-14 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
+              >
+                Добавить слово
+              </button>
+            </div>
+    
+            {/* Модалка выбора CSV */}
+            <CSVUploadModal open={modalOpen} onClose={() => setModalOpen(false)} />         // ← вставили модалку
+          </div>
+    )
 }
