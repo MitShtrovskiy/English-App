@@ -121,6 +121,10 @@ export default function WordListPage() {
             <SwipeableListItem
               key={word.id}
               trailingActions={trailingActions(word.id)}
+              swipeLeft={{
+                content: null, // ❗️отключаем выталкивание карточки
+                action: () => {}, // ❗️ничего не делаем при свайпе
+              }}
             >
               <div
                 onClick={() => navigate(`/words/${word.id}/edit`)}
