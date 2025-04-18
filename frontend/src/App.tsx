@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import WordDetail from './pages/WordDetail'
 import Navbar from './components/Navbar'
 import WordListPage from './pages/WordListPage'
 import EditWordPage from './pages/EditWordPage'
