@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers import auth
 from app.routers import words  # Роутер с эндпоинтами /words
 from app.database import SessionLocal
 from app import models
@@ -27,7 +28,7 @@ async def add_charset_header(request, call_next):
 
 # Подключаем роутер
 app.include_router(words.router)
-
+app.include_router(auth.router)
 
 # === Тестовые данные ===
 def seed_words():

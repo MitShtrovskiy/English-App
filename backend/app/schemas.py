@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 
@@ -36,3 +36,28 @@ class WordOut(WordBase):
     model_config = {
         "from_attributes": True
     }
+    
+# --- User ---
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    
+class UserOut(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    
+    class Config:
+        orm_mode = True
+        
+# --- Auth ---
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    username: str
+    
+# --- Login ---
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
