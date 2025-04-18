@@ -109,16 +109,8 @@ export default function WordListPage() {
         >
           Добавить слово
         </button>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="flex w-[64px] h-[64px] flex-col justify-center items-center gap-2 rounded-[20px] bg-white/10"
-        >
-          <Download className="w-6 h-6 text-white/60" />
-        </button>
+      
       </div>
-      {/* 📦 Модалка загрузки CSV */}
-      <CSVUploadModal open={modalOpen} onClose={() => setModalOpen(false)} />
-
     </div>
   )
 }
