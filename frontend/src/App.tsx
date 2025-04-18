@@ -5,7 +5,6 @@ import WordListPage from './pages/WordListPage'
 import EditWordPage from './pages/EditWordPage'
 import UploadPage from './pages/UploadPage'
 
-
 export default function App() {
   return (
     <Router>
