@@ -64,7 +64,7 @@ export default function WordListPage() {
   const trailingActions = (id: number) => (
     <TrailingActions>
       <SwipeAction destructive onClick={() => handleDeleteWord(id)}>
-        <div className="bg-red-600 text-white px-4 py-2 rounded-l-lg text-sm">Удалить</div>
+        <div className="bg-red-600 text-white px-4 py-5 rounded-l-lg text-sm">Удалить</div>
       </SwipeAction>
     </TrailingActions>
   )
@@ -115,7 +115,7 @@ export default function WordListPage() {
             >
               <div
                 onClick={() => navigate(`/words/${word.id}/edit`)}
-                className="flex h-16 justify-between items-center w-full cursor-pointer rounded-xl transition px-2"
+                className="flex h-16 justify-between items-center w-full cursor-pointer rounded-xl transition px-1"
               >
                 <div className="flex flex-col justify-center items-start gap-[2px] flex-1">
                   <span className="text-[16px] font-light leading-[22px]">{word.word}</span>
