@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom' // ✅ ИЗМЕНЕНО
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { ChevronRight, Download } from 'lucide-react'
 import { api } from '@/utils/api'
 import CSVUploadModal from '@/components/CSVUploadModal'
+
+import {
+  SwipeableList,
+  SwipeableListItem,
+  SwipeAction,
+  TrailingActions,
+} from 'react-swipeable-list'
+import 'react-swipeable-list/dist/styles.css'
 
 interface Word {
   id: number
@@ -18,12 +26,11 @@ export default function WordListPage() {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const [searchParams, setSearchParams] = useSearchParams() // ✅ ИЗМЕНЕНО
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const initialFilter = (searchParams.get('filter') as 'all' | 'learned' | 'unlearned') || 'all' // ✅ ИЗМЕНЕНО
-  const [filter, setFilter] = useState<'all' | 'learned' | 'unlearned'>(initialFilter)           // ✅ ИЗМЕНЕНО
+  const initialFilter = (searchParams.get('filter') as 'all' | 'learned' | 'unlearned') || 'all'
+  const [filter, setFilter] = useState<'all' | 'learned' | 'unlearned'>(initialFilter)
 
-  // ✅ ИЗМЕНЕНО: обновляем и состояние и URL-параметр
   const handleFilterChange = (value: 'all' | 'learned' | 'unlearned') => {
     setFilter(value)
     setSearchParams({ filter: value })
@@ -33,7 +40,6 @@ export default function WordListPage() {
     api
       .get('/words')
       .then((res) => {
-        console.log('📥 Загруженные слова:', res.data)
         const validWords = res.data.filter((w: any) => typeof w.id === 'number')
         setWords(validWords)
       })
@@ -45,6 +51,23 @@ export default function WordListPage() {
     if (filter === 'unlearned') return !word.learned
     return true
   })
+
+  const handleDeleteWord = async (id: number) => {
+    try {
+      await api.delete(`/words/${id}`)
+      setWords((prev) => prev.filter((w) => w.id !== id))
+    } catch (err) {
+      console.error('❌ Ошибка при удалении:', err)
+    }
+  }
+
+  const trailingActions = (id: number) => (
+    <TrailingActions>
+      <SwipeAction destructive onClick={() => handleDeleteWord(id)}>
+        <div className="bg-red-600 text-white px-4 py-2 rounded-l-lg text-sm">Удалить</div>
+      </SwipeAction>
+    </TrailingActions>
+  )
 
   return (
     <div className="min-h-screen bg-black flex flex-col text-white">
@@ -74,7 +97,7 @@ export default function WordListPage() {
           ].map((tab) => (
             <button
               key={tab.value}
-              onClick={() => handleFilterChange(tab.value as typeof filter)} // ✅ ИЗМЕНЕНО
+              onClick={() => handleFilterChange(tab.value as typeof filter)}
               className={`h-10 px-4 flex-1 flex justify-center items-center text-[16px] font-light leading-[22px] rounded-[12px] ${
                 filter === tab.value ? 'bg-white/10' : 'bg-transparent'
               }`}
@@ -84,32 +107,27 @@ export default function WordListPage() {
           ))}
         </div>
 
-        <div className="flex flex-col pl-3 gap-3">
+        <SwipeableList threshold={0.25} fullSwipe={false} className="pl-3">
           {filteredWords.map((word) => (
-            <div
+            <SwipeableListItem
               key={word.id}
-              onClick={() => {
-                console.log('➡️ Переход на редактирование слова:', word)
-                if (typeof word.id === 'number' && !isNaN(word.id)) {
-                  navigate(`/words/${word.id}/edit`)
-                } else {
-                  console.warn('❌ Неверный ID слова:', word)
-                }
-              }}
-              className="flex h-16 justify-between items-center w-full cursor-pointer rounded-xl transition"
+              trailingActions={trailingActions(word.id)}
             >
-              <div className="flex flex-col justify-center items-start gap-[2px] flex-1">
-                <span className="text-[16px] font-light leading-[22px]">{word.word}</span>
-                <span className="text-[14px] font-light leading-[22px] text-white/80">
-                  {word.learned ? 'Выучено' : 'На изучении'}
-                </span>
-              </div>
-              <div className="w-16 h-16 flex justify-center items-center">
+              <div
+                onClick={() => navigate(`/words/${word.id}/edit`)}
+                className="flex h-16 justify-between items-center w-full cursor-pointer rounded-xl transition bg-white/5 px-4"
+              >
+                <div className="flex flex-col justify-center items-start gap-[2px] flex-1">
+                  <span className="text-[16px] font-light leading-[22px]">{word.word}</span>
+                  <span className="text-[14px] font-light leading-[22px] text-white/80">
+                    {word.learned ? 'Выучено' : 'На изучении'}
+                  </span>
+                </div>
                 <ChevronRight className="w-6 h-6 text-white/60" />
               </div>
-            </div>
+            </SwipeableListItem>
           ))}
-        </div>
+        </SwipeableList>
       </div>
 
       <div className="sticky bottom-0 bg-black w-full px-5 pb-6 pt-3 flex gap-2">
