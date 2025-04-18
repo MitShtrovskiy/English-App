@@ -110,8 +110,7 @@ export default function WordListPage() {
                 onClick={() => setModalOpen(true)}                                           // ← открываем модалку
                 className="w-1/3 h-14 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
               >
-                <Download className="w-5 h-5" />                                            // ← иконка загрузки
-                Загрузить слова
+                <Download className="w-5 h-5" />
               </button>
     
               {/* Кнопка добавления нового слова */}
