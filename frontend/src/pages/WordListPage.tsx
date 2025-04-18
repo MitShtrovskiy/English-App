@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom' // ✅ ИЗМЕНЕНО
 import { ChevronRight, Download } from 'lucide-react'
 import { api } from '@/utils/api'
 import CSVUploadModal from '@/components/CSVUploadModal'
@@ -13,12 +13,21 @@ interface Word {
 
 export default function WordListPage() {
   const [words, setWords] = useState<Word[]>([])
-  const [filter, setFilter] = useState<'all' | 'learned' | 'unlearned'>('all')
   const [error, setError] = useState<string | null>(null)
-  const [modalOpen, setModalOpen] = useState(false) 
+  const [modalOpen, setModalOpen] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams() // ✅ ИЗМЕНЕНО
+
+  const initialFilter = (searchParams.get('filter') as 'all' | 'learned' | 'unlearned') || 'all' // ✅ ИЗМЕНЕНО
+  const [filter, setFilter] = useState<'all' | 'learned' | 'unlearned'>(initialFilter)           // ✅ ИЗМЕНЕНО
+
+  // ✅ ИЗМЕНЕНО: обновляем и состояние и URL-параметр
+  const handleFilterChange = (value: 'all' | 'learned' | 'unlearned') => {
+    setFilter(value)
+    setSearchParams({ filter: value })
+  }
 
   useEffect(() => {
     api
@@ -65,7 +74,7 @@ export default function WordListPage() {
           ].map((tab) => (
             <button
               key={tab.value}
-              onClick={() => setFilter(tab.value as typeof filter)}
+              onClick={() => handleFilterChange(tab.value as typeof filter)} // ✅ ИЗМЕНЕНО
               className={`h-10 px-4 flex-1 flex justify-center items-center text-[16px] font-light leading-[22px] rounded-[12px] ${
                 filter === tab.value ? 'bg-white/10' : 'bg-transparent'
               }`}
@@ -75,7 +84,6 @@ export default function WordListPage() {
           ))}
         </div>
 
-        {/* Список слов с логами */}
         <div className="flex flex-col pl-3 gap-3">
           {filteredWords.map((word) => (
             <div
@@ -105,25 +113,21 @@ export default function WordListPage() {
       </div>
 
       <div className="sticky bottom-0 bg-black w-full px-5 pb-6 pt-3 flex gap-2">
-              {/* Кнопка загрузки CSV */}
-              <button
-                onClick={() => setModalOpen(true)}                                           // ← открываем модалку
-                className="w-1/3 h-14 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
-              >
-                <Download className="w-5 h-5" />
-              </button>
-    
-              {/* Кнопка добавления нового слова */}
-              <button
-                onClick={() => navigate('/edit/new')}
-                className="flex-1 h-14 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
-              >
-                Добавить слово
-              </button>
-            </div>
-    
-            {/* Модалка выбора CSV */}
-            <CSVUploadModal open={modalOpen} onClose={() => setModalOpen(false)} />         // ← вставили модалку
-          </div>
-    )
+        <button
+          onClick={() => setModalOpen(true)}
+          className="w-1/3 h-14 flex justify-center items-center gap-2 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
+        >
+          <Download className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => navigate('/edit/new')}
+          className="flex-1 h-14 rounded-[20px] bg-white/10 active:bg-white/20 text-white text-[16px] font-medium"
+        >
+          Добавить слово
+        </button>
+      </div>
+
+      <CSVUploadModal open={modalOpen} onClose={() => setModalOpen(false)} />
+    </div>
+  )
 }
