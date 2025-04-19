@@ -9,7 +9,7 @@ app = FastAPI()
 # === Разрешаем CORS для фронта ===
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ⚠️ В проде лучше указывать конкретный origin
+    allow_origins=["https://english-app-pink.vercel.app"],  # ⚠️ В проде лучше указывать конкретный origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
