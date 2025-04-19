@@ -53,3 +53,12 @@ export const deleteWord = async (id: number) => {
   const response = await api.delete(`/words/${id}`)
   return response.data
 }
+
+// 🔐 Добавляем Authorization header, если есть токен
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
