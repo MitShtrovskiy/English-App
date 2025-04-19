@@ -1,42 +1,37 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth
-from app.routers import words  # Роутер с эндпоинтами /words
+from app.routers import auth, words  # Импортируем роутеры
 from app.database import SessionLocal
 from app import models
 
-from fastapi.middleware.cors import CORSMiddleware
-
 app = FastAPI()
 
-# Добавим CORS и заголовки
-# CORS: разрешаем фронту обращаться к API
+# === Разрешаем CORS для фронта ===
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # ⚠️ В проде лучше указывать конкретный origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# === Добавляем заголовок кодировки ===
 @app.middleware("http")
 async def add_charset_header(request, call_next):
     response = await call_next(request)
     response.headers["Content-Type"] = "application/json; charset=utf-8"
     return response
 
-
-# Подключаем роутер
+# === Подключаем роутеры ===
 app.include_router(words.router)
 app.include_router(auth.router)
 
 # === Тестовые данные ===
 def seed_words():
     db = SessionLocal()
-
     if db.query(models.Word).first():
         db.close()
-        return  # уже есть данные
+        return  # Данные уже есть
 
     sample_words = [
         {
@@ -75,8 +70,7 @@ def seed_words():
     db.commit()
     db.close()
 
-
-# Выполняем при запуске сервера
+# === Выполняем при запуске сервера ===
 @app.on_event("startup")
 def on_startup():
     seed_words()
