@@ -7,7 +7,6 @@ export default function RegisterPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,35 +14,25 @@ export default function RegisterPage() {
   const handleSubmit = async () => {
     setError('')
     try {
-      // 👇 отправка запроса на регистрацию
       const res = await api.post('/auth/register', {
-        username,
         email,
         password,
       })
 
-      // ✅ если успех — сразу логиним пользователя
       login(res.data.token, res.data.username)
       navigate('/')
     } catch (err) {
       setError('Ошибка при регистрации. Попробуйте позже.')
     }
   }
-useEffect(() => {
-  console.log('🔧 RegisterPage монтируется')
-}, [])
-  
+
+  useEffect(() => {
+    console.log('🔧 RegisterPage монтируется')
+  }, [])
+
   return (
     <div className="p-5 text-white space-y-4 max-w-[400px] mx-auto">
       <h2 className="text-2xl">Регистрация</h2>
-
-      <input
-        type="text"
-        placeholder="Имя пользователя"
-        className="w-full p-2 bg-white/10 rounded"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
 
       <input
         type="email"
