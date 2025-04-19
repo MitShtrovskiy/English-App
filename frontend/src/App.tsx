@@ -8,7 +8,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import ProtectedRoute from './ProtectedRoute'            // ✅ защищённые маршруты
-import AuthRedirectGuard from './AuthRedirectGuard'      // ✅ защита для login/register
+import AuthRedirectGuard from './components/AuthRedirectGuard'        // ✅ защита для login/register
 
 export default function App() {
   return (
