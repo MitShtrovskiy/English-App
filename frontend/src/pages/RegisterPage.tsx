@@ -29,7 +29,10 @@ export default function RegisterPage() {
       setError('Ошибка при регистрации. Попробуйте позже.')
     }
   }
-
+useEffect(() => {
+  console.log('🔧 RegisterPage монтируется')
+}, [])
+  
   return (
     <div className="p-5 text-white space-y-4 max-w-[400px] mx-auto">
       <h2 className="text-2xl">Регистрация</h2>
