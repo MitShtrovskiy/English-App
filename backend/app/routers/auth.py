@@ -6,24 +6,36 @@ from datetime import datetime, timedelta
 from app import models, schemas
 from app.database import get_db
 
-SECRET_KEY = "secret"  # ❗ замени на .env
+SECRET_KEY = "secret"  # ❗ лучше вынеси в .env
 ALGORITHM = "HS256"
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+
+# ✅ Генерация токена
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours=24)):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
+# ✅ Регистрация нового пользователя (теперь без username)
 @router.post("/register", response_model=schemas.Token)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db.query(models.User).filter_by(email=user.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
     
     hashed = bcrypt.hash(user.password)
-    db_user = models.User(username=user.username, email=user.email, hashed_password=hashed)
+
+    # генерируем username автоматически из email
+    generated_username = user.email.split("@")[0]
+
+    db_user = models.User(
+        username=generated_username,
+        email=user.email,
+        hashed_password=hashed
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -31,6 +43,8 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     token = create_access_token({"sub": str(db_user.id)})
     return {"access_token": token, "token_type": "bearer", "username": db_user.username}
 
+
+# ✅ Авторизация
 @router.post("/login", response_model=schemas.Token)
 def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter_by(email=data.email).first()

@@ -39,7 +39,6 @@ class WordOut(WordBase):
     
 # --- User ---
 class UserCreate(BaseModel):
-    username: str
     email: EmailStr
     password: str
     
