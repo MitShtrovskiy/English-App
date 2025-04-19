@@ -14,14 +14,18 @@ export default function RegisterPage() {
   const handleSubmit = async () => {
     setError('')
     try {
+      console.log('📤 Отправка запроса регистрации:', { email, password })
       const res = await api.post('/auth/register', {
         email,
         password,
       })
 
-      login(res.data.token, res.data.username)
+      console.log('✅ Ответ от сервера:', res.data)
+
+      login(res.data.access_token, res.data.username)
       navigate('/')
     } catch (err) {
+      console.error('❌ Ошибка при регистрации:', err)
       setError('Ошибка при регистрации. Попробуйте позже.')
     }
   }
