@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage'
 import ProtectedRoute from './ProtectedRoute'            // ✅ защищённые маршруты
 import AuthRedirectGuard from './components/AuthRedirectGuard'        // ✅ защита для login/register
 
+
 export default function App() {
   return (
     <Router>
