@@ -1,37 +1,37 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, words  # Импортируем роутеры
+from app.routers import auth, words
 from app.database import SessionLocal
 from app import models
 
 app = FastAPI()
 
-# === Разрешаем CORS для фронта ===
+# ✅ 1. CORS Middleware — строго до роутеров!
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://english-app-pink.vercel.app"],  # ⚠️ В проде лучше указывать конкретный origin
+    allow_origins=["*"],  # на проде лучше указать конкретный фронт
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# === Добавляем заголовок кодировки ===
+# ✅ 2. Установка заголовка charset (опционально)
 @app.middleware("http")
 async def add_charset_header(request, call_next):
     response = await call_next(request)
     response.headers["Content-Type"] = "application/json; charset=utf-8"
     return response
 
-# === Подключаем роутеры ===
-app.include_router(words.router)
+# ✅ 3. Подключение роутеров
 app.include_router(auth.router)
+app.include_router(words.router)
 
-# === Тестовые данные ===
+# === Тестовые слова ===
 def seed_words():
     db = SessionLocal()
     if db.query(models.Word).first():
         db.close()
-        return  # Данные уже есть
+        return
 
     sample_words = [
         {
@@ -70,7 +70,6 @@ def seed_words():
     db.commit()
     db.close()
 
-# === Выполняем при запуске сервера ===
 @app.on_event("startup")
 def on_startup():
     seed_words()
