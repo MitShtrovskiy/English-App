@@ -13,7 +13,7 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     try {
       const res = await api.post('/auth/login', { email, password })
-      login(res.data.token, res.data.username)
+      login(res.data.token)
       navigate('/')
     } catch (err) {
       setError('Неверные данные для входа')
