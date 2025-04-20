@@ -50,10 +50,19 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=schemas.Token)
 def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter_by(email=data.email).first()
-    if not user or not bcrypt.verify(data.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
+    print(f"🔍 Проверка пользователя: {user}")
+    
+    if not user:
+        print("❌ Пользователь не найден")
+        raise HTTPException(status_code=401, detail="User not found")
+        
+    if not bcrypt.verify(data.password, user.hashed_password):
+        print("❌ Пароль не совпадает")
+        raise HTTPException(status_code=401, detail="Invalid password")
+        
     token = create_access_token({"sub": str(user.id)})
+    print("✅ Авторизация успешна")
+    
     return {
         "access_token": token,
         "token_type": "bearer",
