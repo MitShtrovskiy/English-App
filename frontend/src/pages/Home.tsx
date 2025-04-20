@@ -4,22 +4,34 @@ import WordCard from '../components/WordCard'
 import Navbar from '../components/Navbar'
 import { AnimatePresence } from 'framer-motion'
 import { getRandomGradient } from '../utils/gradients'
-
+import { useAuth } from '@/context/AuthContext' // 👈 добавим
+import { useNavigate } from 'react-router-dom'
 
 export default function Home() {
+  const { token } = useAuth()
+  const navigate = useNavigate()
+
   const [words, setWords] = useState<any[]>([])
   const [index, setIndex] = useState(0)
   const [gradient, setGradient] = useState(getRandomGradient())
 
-  // Загружаем слова 
+  // Загружаем слова только если токен есть
   useEffect(() => {
-    api.get('/words').then((res) => setWords(res.data))
-  }, [])
+    if (!token) return
+
+    api.get('/words')
+      .then((res) => setWords(res.data))
+      .catch((err) => {
+        console.error('Ошибка при получении слов:', err)
+        if (err.response?.status === 401) {
+          navigate('/login') // ⬅️ если токен протух — выкидываем на логин
+        }
+      })
+  }, [token])
 
   const filteredWords = words.filter((w) => !w.learned)
   const currentWord = filteredWords[index]
 
-  // Функция для перехода к следующему слову
   const handleNext = () => {
     if (!filteredWords.length) return
     const nextIndex = (index + 1) % filteredWords.length
@@ -27,7 +39,6 @@ export default function Home() {
     setGradient(getRandomGradient())
   }
 
-  // Функция для перехода к предыдущему слову
   const handlePrev = () => {
     if (!filteredWords.length) return
     const prevIndex = (index - 1 + filteredWords.length) % filteredWords.length
@@ -37,13 +48,11 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col items-center w-full max-w-[440px] mx-auto h-[100dvh] bg-black overflow-hidden">
-      {/* Навбар с прогрессом */}
       <Navbar
         totalCount={words.length}
         learnedCount={words.filter((w) => w.learned).length}
       />
 
-      {/* Карточка слова */}
       <div className="flex-1 w-full overflow-hidden relative">
         <AnimatePresence mode="wait">
           {currentWord && (
@@ -66,7 +75,6 @@ export default function Home() {
         </AnimatePresence>
       </div>
 
-      {/* Кнопки навигации */}
       <div className="flex justify-center items-center gap-2 px-10 pb-4 pt-3 w-full">
         <button
           onClick={handlePrev}
