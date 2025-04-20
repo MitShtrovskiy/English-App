@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 export default function Home() {
-  const { token } = useAuth()
+  const { token, logout } = useAuth()
   const navigate = useNavigate()
 
   const [words, setWords] = useState<any[]>([])
@@ -16,7 +16,6 @@ export default function Home() {
   const [gradient, setGradient] = useState(getRandomGradient())
   const [loading, setLoading] = useState(true)
 
-  // ✅ Загружаем слова один раз, если есть токен
   useEffect(() => {
     if (!token) return
 
@@ -27,6 +26,7 @@ export default function Home() {
       } catch (err: any) {
         console.error('Ошибка при получении слов:', err)
         if (err.response?.status === 401) {
+          logout()
           navigate('/login')
         }
       } finally {
@@ -78,7 +78,7 @@ export default function Home() {
 
       <div className="flex-1 w-full overflow-hidden relative">
         {loading ? (
-          <p className="text-white text-center pt-10">Загрузка...</p>
+          <div className="text-white text-center mt-10">Загрузка...</div>
         ) : (
           <AnimatePresence mode="wait">
             {currentWord && (

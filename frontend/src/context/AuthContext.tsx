@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { api } from '@/utils/api' // 👈 обязательно импортировать, чтобы обновлять headers
+import { api } from '@/utils/api'
 
 interface AuthContextType {
   email: string | null
@@ -20,8 +20,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedToken && savedEmail) {
       setToken(savedToken)
       setEmail(savedEmail)
-
-      // 🧠 при монтировании — на всякий случай обновим headers
       api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`
     }
   }, [])
@@ -31,8 +29,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('email', newEmail)
     setToken(newToken)
     setEmail(newEmail)
-
-    // 🛡️ Обновляем заголовки авторизации
     api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
   }
 
@@ -41,8 +37,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem('email')
     setToken(null)
     setEmail(null)
-
-    // 🧼 Удалим авторизационный заголовок
     delete api.defaults.headers.common['Authorization']
   }
 

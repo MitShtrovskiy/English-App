@@ -1,14 +1,18 @@
-// src/utils/api.ts
 import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
-// ✅ Создаём инстанс axios с базовым URL
 const api = axios.create({
   baseURL: API_BASE_URL,
 })
 
-// 🔐 Добавляем Authorization header, если есть токен
+// Подставляем токен при старте
+const token = localStorage.getItem('token')
+if (token) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+}
+
+// Добавляем токен в каждый запрос
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -17,19 +21,16 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// ✅ Получение всех слов
 export const getWords = async () => {
   const response = await api.get('/words')
   return response.data
 }
 
-// ✅ Получение одного слова по ID
 export const getWord = async (id: number) => {
   const response = await api.get(`/words/${id}`)
   return response.data
 }
 
-// ✅ Добавление нового слова
 export const addWord = async (wordData: {
   word: string
   translation: string
@@ -40,7 +41,6 @@ export const addWord = async (wordData: {
   return response.data
 }
 
-// ✅ Обновление существующего слова
 export const updateWord = async (
   id: number,
   updatedData: {
@@ -55,16 +55,9 @@ export const updateWord = async (
   return response.data
 }
 
-// ✅ Удаление слова
 export const deleteWord = async (id: number) => {
   const response = await api.delete(`/words/${id}`)
   return response.data
-}
-
-// ⬇️ 👇 Подхватываем токен сразу при старте
-const token = localStorage.getItem('token')
-if (token) {
-  api.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
 
 export { api }
