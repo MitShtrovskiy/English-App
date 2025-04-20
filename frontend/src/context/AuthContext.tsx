@@ -1,46 +1,53 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { api } from '@/utils/api' // 👈 обязательно импортировать, чтобы обновлять headers
 
 interface AuthContextType {
-  user: string | null
+  email: string | null
   token: string | null
-  login: (token: string, user: string) => void
+  login: (token: string, email: string) => void
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<string | null>(null)
+  const [email, setEmail] = useState<string | null>(null)
   const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token')
-    const savedUser = localStorage.getItem('user')
-    if (savedToken && savedUser) {
+    const savedEmail = localStorage.getItem('email')
+    if (savedToken && savedEmail) {
       setToken(savedToken)
-      setUser(savedUser)
+      setEmail(savedEmail)
+
+      // 🧠 при монтировании — на всякий случай обновим headers
+      api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`
     }
   }, [])
 
-  const login = (newToken: string, newUser: string) => {
+  const login = (newToken: string, newEmail: string) => {
     localStorage.setItem('token', newToken)
-    localStorage.setItem('user', newUser)
+    localStorage.setItem('email', newEmail)
     setToken(newToken)
-    setUser(newUser)
-    
-    // ⬇️ 👇 ОБНОВЛЯЕМ axios напрямую
+    setEmail(newEmail)
+
+    // 🛡️ Обновляем заголовки авторизации
     api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
   }
 
   const logout = () => {
     localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    localStorage.removeItem('email')
     setToken(null)
-    setUser(null)
+    setEmail(null)
+
+    // 🧼 Удалим авторизационный заголовок
+    delete api.defaults.headers.common['Authorization']
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ email, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
