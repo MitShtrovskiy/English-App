@@ -17,24 +17,23 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!token) return
+    if (!token) {
+      navigate('/login')
+      return
+    }
 
-    const fetchWords = async () => {
-      try {
-        const res = await api.get('/words')
+    api.get('/words')
+      .then((res) => {
         setWords(res.data)
-      } catch (err: any) {
+        setLoading(false)
+      })
+      .catch((err) => {
         console.error('Ошибка при получении слов:', err)
         if (err.response?.status === 401) {
           logout()
           navigate('/login')
         }
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchWords()
+      })
   }, [token])
 
   const filteredWords = words.filter((w) => !w.learned)
@@ -54,19 +53,12 @@ export default function Home() {
     setGradient(getRandomGradient())
   }
 
-  const markAsLearned = async () => {
-    if (!currentWord) return
-    try {
-      await api.patch(`/words/${currentWord.id}`, { learned: true })
-      setWords((prev) =>
-        prev.map((w) =>
-          w.id === currentWord.id ? { ...w, learned: true } : w
-        )
-      )
-      handleNext()
-    } catch (err) {
-      console.error('Ошибка при обновлении слова:', err)
-    }
+  if (loading) {
+    return (
+      <div className="text-white flex justify-center items-center h-screen">
+        Загрузка...
+      </div>
+    )
   }
 
   return (
@@ -77,20 +69,24 @@ export default function Home() {
       />
 
       <div className="flex-1 w-full overflow-hidden relative">
-        {loading ? (
-          <div className="text-white text-center mt-10">Загрузка...</div>
-        ) : (
-          <AnimatePresence mode="wait">
-            {currentWord && (
-              <WordCard
-                key={currentWord.id}
-                word={currentWord}
-                gradient={gradient}
-                onMarkAsLearned={markAsLearned}
-              />
-            )}
-          </AnimatePresence>
-        )}
+        <AnimatePresence mode="wait">
+          {currentWord && (
+            <WordCard
+              key={currentWord.id}
+              word={currentWord}
+              gradient={gradient}
+              onMarkAsLearned={() => {
+                api.patch(`/words/${currentWord.id}`, { learned: true })
+                  .then(() => {
+                    api.get('/words').then((res) => {
+                      setWords(res.data)
+                      handleNext()
+                    })
+                  })
+              }}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="flex justify-center items-center gap-2 px-10 pb-4 pt-3 w-full">
