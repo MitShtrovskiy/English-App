@@ -1,13 +1,20 @@
-// src/api.ts
-
+// src/utils/api.ts
 import axios from 'axios'
 
-// ✅ Получаем базовый адрес из .env
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 // ✅ Создаём инстанс axios с базовым URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  baseURL: API_BASE_URL,
+})
+
+// 🔐 Добавляем Authorization header, если есть токен
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
 })
 
 // ✅ Получение всех слов
@@ -54,11 +61,4 @@ export const deleteWord = async (id: number) => {
   return response.data
 }
 
-// 🔐 Добавляем Authorization header, если есть токен
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+export { api }  // 👈 обязательно экспортируем сам инстанс
