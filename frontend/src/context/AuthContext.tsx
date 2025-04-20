@@ -27,6 +27,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('user', newUser)
     setToken(newToken)
     setUser(newUser)
+    
+    // ⬇️ 👇 ОБНОВЛЯЕМ axios напрямую
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
   }
 
   const logout = () => {

@@ -15,12 +15,12 @@ export default function RegisterPage() {
     setError('')
     try {
       console.log('📤 Отправка запроса регистрации:', { email, password })
-      const res = await api.post('/auth/register', {
-        email,
-        password,
-      })
+      const res = await api.post('/auth/register', { email, password })
 
       console.log('✅ Ответ от сервера:', res.data)
+
+      // 🛠️ Добавляем Authorization заголовок сразу
+      api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
 
       login(res.data.access_token, res.data.username)
       navigate('/')

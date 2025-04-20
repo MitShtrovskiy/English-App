@@ -61,4 +61,10 @@ export const deleteWord = async (id: number) => {
   return response.data
 }
 
-export { api }  // 👈 обязательно экспортируем сам инстанс
+// ⬇️ 👇 Подхватываем токен сразу при старте
+const token = localStorage.getItem('token')
+if (token) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+}
+
+export { api }
