@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/utils/api'
 import { useAuth } from '@/context/AuthContext'
@@ -14,25 +14,20 @@ export default function RegisterPage() {
   const handleSubmit = async () => {
     setError('')
     try {
-      console.log('📤 Отправка запроса регистрации:', { email, password })
       const res = await api.post('/auth/register', { email, password })
 
-      console.log('✅ Ответ от сервера:', res.data)
+      // ✅ сохраняем токен и email
+      login(res.data.access_token, res.data.email)
 
-      // 🛠️ Добавляем Authorization заголовок сразу
+      // ✅ подставляем токен в axios
       api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
 
-      login(res.data.access_token, res.data.username)
       navigate('/')
     } catch (err) {
       console.error('❌ Ошибка при регистрации:', err)
       setError('Ошибка при регистрации. Попробуйте позже.')
     }
   }
-
-  useEffect(() => {
-    console.log('🔧 RegisterPage монтируется')
-  }, [])
 
   return (
     <div className="p-5 text-white space-y-4 max-w-[400px] mx-auto">

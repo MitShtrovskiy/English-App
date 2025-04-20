@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/utils/api'
 import { useAuth } from '@/context/AuthContext'
@@ -11,9 +11,16 @@ export default function LoginPage() {
   const navigate = useNavigate()
 
   const handleSubmit = async () => {
+    setError('')
     try {
       const res = await api.post('/auth/login', { email, password })
-      login(res.data.token)
+
+      // ✅ сохраняем токен и email (вместо username)
+      login(res.data.access_token, res.data.email)
+
+      // ✅ подставляем токен в axios (на всякий случай)
+      api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+
       navigate('/')
     } catch (err) {
       setError('Неверные данные для входа')
