@@ -65,8 +65,8 @@ export default function Home() {
                   .patch(`/words/${currentWord.id}`, { learned: true })
                   .then(() => {
                     api.get('/words').then((res) => {
-                      setWords(res.data)
                       handleNext()
+                      setWords(res.data)
                     })
                   })
               }}
